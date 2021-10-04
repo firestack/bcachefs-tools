@@ -1,6 +1,16 @@
 use anyhow::anyhow;
 use structopt::StructOpt;
 
+pub mod err {
+	pub enum GError {
+		Unknown{
+			message: std::borrow::Cow<'static, String>
+		 }
+	}
+	pub type GResult<T, E, OE> =::core::result::Result< ::core::result::Result<T, E>, OE>;
+	pub type Result<T, E> = GResult<T, E, GError>;
+}
+
 #[macro_export]
 macro_rules! c_str {
 	($lit:expr) => {
@@ -22,14 +32,14 @@ impl std::fmt::Display for ErrnoError {
 impl std::error::Error for ErrnoError {}
 
 #[derive(Debug)]
-pub(crate) enum KeyLocation {
+pub enum KeyLocation {
 	Fail,
 	Wait,
 	Ask,
 }
 
 #[derive(Debug)]
-struct KeyLoc(Option<KeyLocation>);
+pub struct KeyLoc(pub Option<KeyLocation>);
 impl std::ops::Deref for KeyLoc {
 	type Target = Option<KeyLocation>;
 	fn deref(&self) -> &Self::Target {
@@ -52,7 +62,7 @@ impl std::str::FromStr for KeyLoc {
 
 #[derive(StructOpt, Debug)]
 /// Mount a bcachefs filesystem by its UUID.
-struct Options {
+pub struct Options {
 	/// Where the password would be loaded from.
 	///
 	/// Possible values are:
@@ -60,60 +70,22 @@ struct Options {
 	/// "wait" - wait for password to become available before mounting;
 	/// "ask" -  prompt the user for password;
 	#[structopt(short, long, default_value = "")]
-	key_location: KeyLoc,
+	pub key_location: KeyLoc,
 
 	/// External UUID of the bcachefs filesystem
-	uuid: uuid::Uuid,
+	pub uuid: uuid::Uuid,
 
 	/// Where the filesystem should be mounted. If not set, then the filesystem
 	/// won't actually be mounted. But all steps preceeding mounting the
 	/// filesystem (e.g. asking for passphrase) will still be performed.
-	mountpoint: Option<std::path::PathBuf>,
+	pub mountpoint: Option<std::path::PathBuf>,
 
 	/// Mount options
 	#[structopt(short, default_value = "")]
-	options: String,
+	pub options: String,
 }
 
-mod filesystem;
-mod key;
-
-#[tracing_attributes::instrument("main")]
-pub fn main_inner() -> anyhow::Result<()> {
-	unsafe {
-		libc::setvbuf(
-			crate::filesystem::stdout,
-			std::ptr::null_mut(),
-			libc::_IONBF,
-			0,
-		);
-		// libc::fflush(crate::filesystem::stdout);
-	}
-	let opt = Options::from_args_safe()?;
-	tracing::trace!(?opt);
-
-	let fss = filesystem::probe_filesystems()?;
-	let fs = fss
-		.get(&opt.uuid)
-		.ok_or_else(|| anyhow::anyhow!("filesystem was not found"))?;
-
-	tracing::info!(msg="found filesystem", %fs);
-	if fs.encrypted() {
-		let key = opt
-			.key_location
-			.0
-			.ok_or_else(|| anyhow::anyhow!("no keyoption specified for locked filesystem"))?;
-
-		key::prepare_key(&fs, key)?;
-	}
-
-	let mountpoint = opt
-		.mountpoint
-		.ok_or_else(|| anyhow::anyhow!("mountpoint option was not specified"))?;
-
-	fs.mount(&mountpoint, &opt.options)?;
-
-	Ok(())
-}
+pub mod filesystem;
+pub mod key;
 
 // pub fn mnt_in_use()

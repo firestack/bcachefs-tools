@@ -84,7 +84,7 @@ fn ask_for_key(fs: &FileSystem) -> anyhow::Result<()> {
 }
 
 #[tracing_attributes::instrument]
-pub(crate) fn prepare_key(fs: &FileSystem, password: crate::KeyLocation) -> anyhow::Result<()> {
+pub fn prepare_key(fs: &FileSystem, password: crate::KeyLocation) -> anyhow::Result<()> {
 	use crate::KeyLocation::*;
 	use anyhow::anyhow;
 
