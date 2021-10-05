@@ -74,11 +74,14 @@ endif
 undefine var
 
 ifeq (,$(RST2MAN))
-	@echo "WARNING: no RST2MAN found!"
+  @echo "WARNING: no RST2MAN found!"
 endif
 
 .PHONY: all
 all: bcachefs bcachefs.5
+
+.PHONY: lib
+lib: libbcachefs.so
 
 .PHONY: tests
 tests: tests/test_helper
@@ -120,6 +123,14 @@ libbcachefs_mount.a: $(MOUNT_SRCS)
 	cp mount/target/release/libbcachefs_mount.a $@
 
 MOUNT_OBJ=$(filter-out ./bcachefs.o ./tests/%.o ./cmd_%.o , $(OBJS))
+
+libbcachefs.so: LDFLAGS+=-shared
+libbcachefs.so: $(MOUNT_OBJ)
+	$(CC) $(LDFLAGS) $+ -o $@ $(LDLIBS)
+
+# libbcachefs: libbcachefs.so
+
+
 mount.bcachefs: libbcachefs_mount.a $(MOUNT_OBJ)
 	$(CC) -Wl,--gc-sections libbcachefs_mount.a $(MOUNT_OBJ) -o $@ $(LDLIBS)
 
@@ -138,7 +149,7 @@ cmd_version.o : .version
 .PHONY: install
 install: INITRAMFS_HOOK=$(INITRAMFS_DIR)/hooks/bcachefs
 install: INITRAMFS_SCRIPT=$(INITRAMFS_DIR)/scripts/local-premount/bcachefs
-install: bcachefs
+install: bcachefs lib
 	$(INSTALL) -m0755 -D bcachefs      -t $(DESTDIR)$(ROOT_SBINDIR)
 	$(INSTALL) -m0755    fsck.bcachefs    $(DESTDIR)$(ROOT_SBINDIR)
 	$(INSTALL) -m0755    mkfs.bcachefs    $(DESTDIR)$(ROOT_SBINDIR)
@@ -146,6 +157,8 @@ install: bcachefs
 	$(INSTALL) -m0755 -D initramfs/script $(DESTDIR)$(INITRAMFS_SCRIPT)
 	$(INSTALL) -m0755 -D initramfs/hook   $(DESTDIR)$(INITRAMFS_HOOK)
 	$(INSTALL) -m0755 -D mount.bcachefs.sh $(DESTDIR)$(ROOT_SBINDIR)
+	$(INSTALL) -m0755 -D libbcachefs.so -t $(PREFIX)/lib/
+  
 	sed -i '/^# Note: make install replaces/,$$d' $(DESTDIR)$(INITRAMFS_HOOK)
 	echo "copy_exec $(ROOT_SBINDIR)/bcachefs /sbin/bcachefs" >> $(DESTDIR)$(INITRAMFS_HOOK)
 

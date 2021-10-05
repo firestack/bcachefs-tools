@@ -1,15 +1,20 @@
 fn main() {
 	use std::path::PathBuf;
-	use std::process::Command;
+	// use std::process::Command;
 
-	let out_dir: PathBuf = std::env::var_os("OUT_DIR").unwrap().into();
-	let top_dir: PathBuf = std::env::var_os("CARGO_MANIFEST_DIR").unwrap().into();
+	let out_dir: PathBuf = std::env::var_os("OUT_DIR").expect("ENV Var 'OUT_DIR' Expected").into();
+	let top_dir: PathBuf = std::env::var_os("CARGO_MANIFEST_DIR").expect("ENV Var 'CARGO_MANIFEST_DIR' Expected").into();
 	let libbcachefs_inc_dir = std::env::var("LIBBCACHEFS_INCLUDE")
 		.unwrap_or_else(|_| top_dir.join("libbcachefs").display().to_string());
 	let libbcachefs_inc_dir = std::path::Path::new(&libbcachefs_inc_dir);
 	println!("{}", libbcachefs_inc_dir.display());
 
-	let libbcachefs_dir = top_dir.join("libbcachefs").join("libbcachefs");
+	println!("cargo:rustc-link-lib=dylib=bcachefs");
+	println!("cargo:rustc-link-search={}"
+		, env!("LIBBCACHEFS_LIB"));
+
+
+	let _libbcachefs_dir = top_dir.join("libbcachefs").join("libbcachefs");
 	let bindings = bindgen::builder()
 		.header(top_dir
 			.join("src")
@@ -46,10 +51,12 @@ fn main() {
 		.opaque_type("gendisk")
 		.opaque_type("bkey")
 		.generate()
-		.unwrap();
-	bindings.write_to_file(out_dir.join("bcachefs.rs")).unwrap();
+		.expect("BindGen Generation Failiure: [libbcachefs_wrapper]");
+	bindings.write_to_file(out_dir.join("bcachefs.rs"))
+		.expect("Writing to output file failed for: `bcachefs.rs`");
 
-	let keyutils = pkg_config::probe_library("libkeyutils").unwrap();
+	let keyutils = pkg_config::probe_library("libkeyutils")
+		.expect("Failed to find keyutils lib");
 	let bindings = bindgen::builder()
 		.header(top_dir
 			.join("src")
@@ -62,6 +69,7 @@ fn main() {
 				.map(|p| format!("-I{}", p.display())),
 		)
 		.generate()
-		.unwrap();
-	bindings.write_to_file(out_dir.join("keyutils.rs")).unwrap();
+		.expect("BindGen Generation Failiure: [Keyutils]");
+	bindings.write_to_file(out_dir.join("keyutils.rs"))
+		.expect("Writing to output file failed for: `keyutils.rs`");
 }
