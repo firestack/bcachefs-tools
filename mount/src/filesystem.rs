@@ -167,22 +167,24 @@ pub fn probe_filesystems() -> anyhow::Result<HashMap<Uuid, FileSystem>> {
 	udev.match_subsystem("block")?; // find kernel block devices
 
 	let mut fs_map = HashMap::new();
-	let devs = 
+	let devresults = 
 			udev.scan_devices()?
 			.into_iter()
-			.filter_map(|dev| dev.devnode().map(ToOwned::to_owned))
-			.map(|node|	get_super_block_uuid(&node).map(|r|  r.map(|r| (r, node))));
-	for r in devs {
-		match r? {
-			Ok(((uuid_key, superblock), nodepath)) => {
-				let fs = fs_map.entry(uuid_key).or_insert_with(|| {
-					tracing::info!(msg="found bcachefs pool", uuid=?uuid_key);
-					FileSystem::new(superblock)
-				});
+			.filter_map(|dev| dev.devnode().map(ToOwned::to_owned));
+	
+	for pathbuf in devresults {
+		match get_super_block_uuid(&pathbuf)? {
 
-				fs.devices.push(nodepath);
-			},
-			_ => {}
+				Ok((uuid_key, superblock)) => {
+					let fs = fs_map.entry(uuid_key).or_insert_with(|| {
+						tracing::info!(msg="found bcachefs pool", uuid=?uuid_key);
+						FileSystem::new(superblock)
+					});
+
+					fs.devices.push(pathbuf);
+				},
+
+				Err(e) => { tracing::debug!(inner2_error=?e);}
 		}
 	}
 
@@ -192,8 +194,12 @@ pub fn probe_filesystems() -> anyhow::Result<HashMap<Uuid, FileSystem>> {
 }
 
 // #[tracing_attributes::instrument(skip(dev, fs_map))]
-fn get_super_block_uuid(path: &std::path::Path) -> std::io::Result<anyhow::Result<(Uuid, bcachefs::bch_sb_handle)>> {
-	let (super_block, _mount_options) = rlibbcachefs::rs::read_super(&path)??;
+fn get_super_block_uuid(path: &std::path::Path) -> std::io::Result<std::io::Result<(Uuid, bcachefs::bch_sb_handle)>> {
+	let sb = rlibbcachefs::rs::read_super(&path)?;
+	let (super_block, _mount_options) = match sb { 
+		Ok(sb) => sb,
+		Err(e) => { return Ok(Err(e)); }
+	};
 
 	let uuid = (&super_block).sb().uuid();
 	tracing::debug!(found="bcachefs superblock", devnode=?path, ?uuid);
