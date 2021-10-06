@@ -29,7 +29,7 @@ fn main() {
 		.clang_arg("-DZSTD_STATIC_LINKING_ONLY")
 		.clang_arg("-DNO_BCACHEFS_FS")
 		.clang_arg("-D_GNU_SOURCE")
-		.derive_debug(false)
+		.derive_debug(true)
 		.derive_default(true)
 		.default_enum_style(bindgen::EnumVariation::Rust {
 			non_exhaustive: true,
