@@ -5,7 +5,7 @@ fn main() {
 	tracing_subscriber::fmt::init();
 
 	if let Err(e) = crate::main_inner() {
-		tracing::error!(err = ?e);
+		tracing::error!(fatal_error = ?e);
 	}
 }
 
