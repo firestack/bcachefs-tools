@@ -19,9 +19,9 @@ fn main() {
 }
 
 fn inner() -> std::io::Result<()> {
-	use std::io::{Error, ErrorKind};
+	// use std::io::{Error, ErrorKind};
 
-	let mut args = Options::from_args();
+	let args = Options::from_args();
 	let offsets = vec![8, 2056, args.sb_offset.unwrap_or(0)];
 	tracing::debug!(?offsets);
 	let _sb = offsets.iter().find_map(|i| read_offset_block(&args.device, *i).ok()).expect("No SuperBlock Found");
@@ -34,7 +34,7 @@ fn inner() -> std::io::Result<()> {
 	for i in &blocks {
 
 		let _sb = read_offset_block(&args.device, **i);
-		dbg!(_sb.map(|i| i.sb().layout.magic));
+		tracing::info!(magic=?_sb.map(|i| i.sb().layout.magic));
 	}
 	Ok(())
 }

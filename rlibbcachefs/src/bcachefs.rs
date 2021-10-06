@@ -63,3 +63,30 @@ impl bch_sb_handle {
         unsafe { &*self.sb }
     }
 }
+
+#[repr(C, packed(8))]
+// #[repr(align(8))]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct bch_extent_ptr {
+	pub _bitfield_1: __BindgenBitfieldUnit<[u8; 8usize]>,
+}
+
+#[repr(C, packed(8))]
+pub struct btree_node {
+	pub csum: bch_csum,
+	pub magic: __le64,
+	pub flags: __le64,
+	pub min_key: bpos,
+	pub max_key: bpos,
+	pub _ptr: bch_extent_ptr,
+	pub format: bkey_format,
+	pub __bindgen_anon_1: btree_node__bindgen_ty_1,
+}
+
+#[repr(C, packed(8))]
+// #[repr(align(8))]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct bch_extent_crc32 {
+	pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
+	pub csum: __u32,
+}
