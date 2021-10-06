@@ -55,9 +55,9 @@ pub fn main_inner() -> anyhow::Result<()> {
 
 #[cfg(test)]
 mod test {
-	use insta::assert_debug_snapshot;
-	#[test]
-	fn snapshot_testing() {
-		insta::assert_debug_snapshot!();
-	}
+	// use insta::assert_debug_snapshot;
+	// #[test]
+	// fn snapshot_testing() {
+	// 	insta::assert_debug_snapshot!();
+	// }
 }
