@@ -24,7 +24,7 @@ fn inner() -> std::io::Result<()> {
 	let mut args = Options::from_args();
 	let offsets = vec![8, 2056, args.sb_offset.unwrap_or(0)];
 	tracing::debug!(?offsets);
-	let _sb = offsets.iter().find_map(|i| read_offset_block(&args.device, *i).ok()).expect("hi");
+	let _sb = offsets.iter().find_map(|i| read_offset_block(&args.device, *i).ok()).expect("No SuperBlock Found");
 	// .expect("couldn't find superblock")?;
 	let sb = _sb.sb();
 	let layout = sb.layout;
@@ -49,5 +49,6 @@ fn read_offset_block(device: &std::path::Path, offset: u64) -> Result<rlibbcache
 	opts.set_nochanges_defined(1);
 	opts.set_noexcl_defined(1);
 	opts.set_sb_defined(1);
-	rlibbcachefs::rs::read_super_opts(device, opts)
+
+	rlibbcachefs::rs::read_super_opts(device, opts)?.map(|i| i.0)
 }
