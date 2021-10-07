@@ -10,3 +10,4 @@ rlibbcachefs = { path = "../../rlibbcachefs/" }
 structopt = "0.3.23"
 tracing = "0.1.29"
 tracing-subscriber = "0.2.25"
+uuid = "0.8.2"
