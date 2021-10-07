@@ -9,7 +9,7 @@ pub enum ReadSuperErr { Io(std::io::Error), }
 type RResult<T> = std::io::Result<std::io::Result<T>>;
 
 #[tracing_attributes::instrument(skip(opts))]
-pub fn read_super_opts(path: &std::path::Path, mut opts: bcachefs::bch_opts) -> RResult<(bcachefs::bch_sb_handle, bcachefs::bch_opts)> {
+pub fn read_super_opts(path: &std::path::Path, mut opts: bcachefs::bch_opts) -> RResult<bcachefs::bch_sb_handle> {
 	// let devp = camino::Utf8Path::from_path(devp).unwrap();
 	
 	use std::os::unix::ffi::OsStrExt;
@@ -34,10 +34,9 @@ pub fn read_super_opts(path: &std::path::Path, mut opts: bcachefs::bch_opts) -> 
 			std::io::ErrorKind::PermissionDenied,
 			"Access Permission Denied",
 		)),
-		0 => Ok(Ok( unsafe {(
-			sb.assume_init(),
-			opts,
-		)})),
+		0 => Ok(Ok( unsafe {
+			sb.assume_init()
+		})),
 		22 => Ok(Err(std::io::Error::new(
 			std::io::ErrorKind::InvalidData,
 			"Not a BCacheFS SuperBlock",
@@ -52,7 +51,7 @@ pub fn read_super_opts(path: &std::path::Path, mut opts: bcachefs::bch_opts) -> 
 }
 
 #[tracing_attributes::instrument]
-pub fn read_super(path: &std::path::Path) -> RResult<(bcachefs::bch_sb_handle, bcachefs::bch_opts)> {
+pub fn read_super(path: &std::path::Path) -> RResult<bcachefs::bch_sb_handle> {
 	let opts = bcachefs::bch_opts::default(); //unsafe {std::mem::MaybeUninit::zeroed().assume_init()};
 	read_super_opts(path, opts)
 }
