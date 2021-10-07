@@ -34,7 +34,10 @@ fn inner() -> std::io::Result<()> {
 	for i in &blocks {
 
 		let _sb = read_offset_block(&args.device, **i);
-		tracing::info!(magic=?_sb.map(|i| i.sb().layout.magic));
+		tracing::info!(
+			magic=?_sb.map(|i| i.sb().layout.magic),
+			loc=i,
+		);
 	}
 	Ok(())
 }
