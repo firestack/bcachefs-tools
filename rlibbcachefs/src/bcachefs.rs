@@ -62,6 +62,10 @@ impl bch_sb_handle {
     pub fn sb(&self) -> &bch_sb {
         unsafe { &*self.sb }
     }
+
+    pub fn bdev(&self) -> &block_device {
+        unsafe { &*self.bdev }
+    }
 }
 
 #[repr(C, packed(8))]
