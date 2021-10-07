@@ -196,9 +196,9 @@ pub fn probe_filesystems() -> anyhow::Result<HashMap<Uuid, FileSystem>> {
 // #[tracing_attributes::instrument(skip(dev, fs_map))]
 fn get_super_block_uuid(path: &std::path::Path) -> std::io::Result<std::io::Result<(Uuid, bcachefs::bch_sb_handle)>> {
 	let sb = rlibbcachefs::rs::read_super(&path)?;
-	let (super_block, _mount_options) = match sb { 
-		Ok(sb) => sb,
+	let super_block = match sb { 
 		Err(e) => { return Ok(Err(e)); }
+		Ok(sb) => sb,
 	};
 
 	let uuid = (&super_block).sb().uuid();
