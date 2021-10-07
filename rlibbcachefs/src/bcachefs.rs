@@ -90,3 +90,7 @@ pub struct bch_extent_crc32 {
 	pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
 	pub csum: __u32,
 }
+
+// #[repr(u8)]
+pub enum rhash_lock_head {}
+pub enum srcu_struct {}

@@ -45,6 +45,8 @@ fn main() {
 		.blocklist_type("bch_extent_ptr")
 		.blocklist_type("btree_node")
 		.blocklist_type("bch_extent_crc32")
+		.blocklist_type("rhash_lock_head")
+		.blocklist_type("srcu_struct")
 		.allowlist_var("BCH_.*")
 		.allowlist_var("KEY_SPEC_.*")
 		.allowlist_type("bch_kdf_types")
