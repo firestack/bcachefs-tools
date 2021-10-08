@@ -47,6 +47,7 @@ stdenv.mkDerivation {
 		exclude = [
 			./mount
 			./rlibbcachefs
+			./cmds
 			
 			./.git
 			./nix

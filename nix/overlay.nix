@@ -20,6 +20,8 @@ final: prev: {
 		
 		rlibbcachefs = final.callPackage ../rlibbcachefs {
 		};
+
+		sbfind = final.callPackage ../cmds/sbfind {};
 		
 		kernelPackages = final.recurseIntoAttrs (final.linuxPackagesFor final.bcachefs.kernel);
 	};

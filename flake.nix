@@ -33,6 +33,7 @@
 					mount
 					tools
 					rlibbcachefs
+					sbfind
 					kernel;
 
 				musl-tools = pkgs.pkgsMusl.bcachefs.tools;
