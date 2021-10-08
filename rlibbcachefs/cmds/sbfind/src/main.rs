@@ -23,45 +23,70 @@ fn inner() -> std::io::Result<()> {
 	// use std::io::{Error, ErrorKind};
 
 	let args = Options::from_args();
-	use std::os::unix::io::IntoRawFd;
 
-	// Want device filedescriptor for reuse
 	let _sb = find_working_superblock(&args.device, args.sb_offset)??;
-	// let _sb = offsets.iter().map(|i| read_offset_block(&args.device, *i)).expect("No SuperBlock Found")?;
-	// .expect("couldn't find superblock")?;
 	let sb = _sb.sb();
-	let layout = sb.layout;
 
-	let blocks: Vec<_> = layout.sb_offset.iter().take(layout.nr_superblocks as usize).copied().collect();
+	let blocks: Vec<_> = sb.layout.sb_offset.iter().take(sb.layout.nr_superblocks as usize).copied().collect();
 
-	Ok(check_block_locations(&args.device, &blocks[..])??)
+	check_block_locations(&args.device, &blocks[..])?.map(|_| ())
+}
 
+fn rebuild_superblock(device: &std::path::Path, superblock: &mut rlibbcachefs::c::bch_sb) -> std::io::Result<()> {
+	use std::os::unix::io::AsRawFd;
+	unsafe {
+		rlibbcachefs::c::bch2_super_write_fd(
+			std::fs::OpenOptions::new().write(true).open(device)?.as_raw_fd()
+			, superblock
+		);
+	}
+	Ok(())
 }
 
 #[tracing::instrument]
 fn find_working_superblock(device: &std::path::Path, search: Option<u64>) -> RResult<rlibbcachefs::bcachefs::bch_sb_handle> {
 	let offsets = vec![search.unwrap_or(8), 2056];
-	tracing::debug!(msg="testing offsets", ?offsets);
+	tracing::debug!(msg="searching default offsets", ?offsets);
 
 	let mut handle = None;
 	for offset in offsets { // can't map because of outter error propogation
 
 		match check_super_offset(device, offset)? {
 			Ok(sbhandle) => { handle = Some(sbhandle); break; },
-			Err(e) => { tracing::debug!(msg="Failed to read superblock"); continue; }
+			Err(_) => { continue; }
 		}
 	}
 	Ok(Ok(handle.expect("No SuperBlock Found")))
 }
 
-#[tracing::instrument]
-fn check_block_locations(device: &std::path::Path, blocks: &[u64]) -> RResult<()> {
-	tracing::info!("searching blocks");
+#[tracing::instrument(skip(device, blocks))]
+fn check_block_locations(device: &std::path::Path, blocks: &[u64]) -> RResult<Vec<rlibbcachefs::bcachefs::bch_sb_handle>> {
+	// tracing::info!("searching blocks");
+	let mut v = vec![];
+	
 	for offset in blocks {
 		let rhandle = check_super_offset(device, *offset)?;
-		tracing::debug!(?rhandle);
+		// tracing::debug!(?rhandle);
+		if let Ok(handle) = rhandle {
+			v.push(handle);
+		}
 	}
-	Ok(Ok(()))
+	Ok(Ok(v))
+}
+
+unsafe fn read_super(device: &std::path::Path, offset: u64) -> std::io::Result<rlibbcachefs::c::bch_sb> {
+	use std::os::unix::{fs::FileExt};
+	
+	let mut sb = [0; std::mem::size_of::<rlibbcachefs::c::bch_sb>()];
+
+	std::fs::File::open(device)?.read_exact_at(&mut sb, offset*512 as u64)?;
+	let sb = std::mem::transmute::<_, rlibbcachefs::c::bch_sb>(sb);
+	
+	assert_eq!(sb.magic.b, rlibbcachefs::c::BCH_FS_MAGIC.b);
+	assert_eq!(sb.offset, offset);
+	trace_superblock(&sb);
+	
+	Ok(sb)
 }
 
 #[tracing::instrument]
@@ -70,12 +95,12 @@ fn check_super_offset(device: &std::path::Path, offset: u64) -> RResult<rlibbcac
 	match rhandle {
 		Ok(handle) => {
 			let sb = handle.sb();
-			tracing::info!(
-				magic=?uuid::Uuid::from_slice(&sb.layout.magic.b[..]),
-				disk_fd=?handle.bdev().bd_fd,
-				sb_sector=?sb.offset,
-				byte_offset=?sb.offset*512
-			);
+			// tracing::info!(
+			// 	uuid=?sb.uuid(),//uuid::Uuid::from_slice(&sb.layout.uuid.b[..]),
+			// 	sb_sector=?sb.offset,
+			// 	byte_offset=?sb.offset*512
+			// );
+			trace_superblock(sb);
 			Ok(Ok(handle))
 		},
 		Err(err) => {
@@ -85,6 +110,15 @@ fn check_super_offset(device: &std::path::Path, offset: u64) -> RResult<rlibbcac
 	}
 }
 
+fn trace_superblock(sb: &rlibbcachefs::c::bch_sb) {
+	tracing::info!(
+		uuid=?sb.uuid(),//uuid::Uuid::from_slice(&sb.layout.uuid.b[..]),
+		sb_sector=?sb.offset,
+		byte_offset=?sb.offset*512,
+		?sb.csum.lo,
+		?sb.csum.hi,
+	);
+}
 type RResult<T> = std::io::Result<std::io::Result<T>>;
 fn read_offset_block(device: &std::path::Path, offset: u64) -> RResult<rlibbcachefs::bcachefs::bch_sb_handle> {
 	let mut opts = rlibbcachefs::bcachefs::bch_opts {

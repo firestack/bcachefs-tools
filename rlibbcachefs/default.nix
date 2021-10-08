@@ -55,7 +55,6 @@ in rustPlatform.buildRustPackage {
 	LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
 	BINDGEN_EXTRA_CLANG_ARGS = lib.replaceStrings ["\n" "\t"] [" " ""] ''
 		-std=gnu99
-		-H
 		-I${include.glibc}
 		-I${include.clang}
 		-I${include.urcu}
