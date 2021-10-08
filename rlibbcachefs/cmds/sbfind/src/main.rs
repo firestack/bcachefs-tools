@@ -21,7 +21,7 @@ fn main() {
 }
 
 #[tracing::instrument]
-fn inner() -> std::io::Result<()> {
+fn inner() -> anyhow::Result<()> {
 	// use std::io::{Error, ErrorKind};
 
 	let args = Options::from_args();
