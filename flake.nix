@@ -40,6 +40,10 @@
 				musl-mount = pkgs.pkgsMusl.bcachefs.mount;
 			};
 
+			checks = { inherit (packages) 
+				mount tools rlibbcachefs sbfind kernel
+			; };
+
 			devShells.tools = pkgs.bcachefs.tools.override { inShell = true; };
 			devShells.mount = pkgs.bcachefs.mount.override { inShell = true; };
 			devShell = devShells.tools;
