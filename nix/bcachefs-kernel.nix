@@ -3,9 +3,9 @@
 , fetchgit
 , fetchFromGitHub
 , buildLinux
+, commit
 , date ? "2021-08-05"
-, commit ? "60fbf06f49679fdb2b37e1e863c321dfddfc3a4a"
-, diffHash ? "sha256-9NUTmC8FnXJzJ0tF2FrGW10fuGSRVq3ONdSzVmoOSTs="
+, diffHash ? lib.fakeSha256
 , kernelVersion ? "5.13.0"
 , kernelPatches ? [] # must always be defined in bcachefs' all-packages.nix entry because it's also a top-level attribute supplied by callPackage
 , argsOverride ? {}
