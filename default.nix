@@ -25,8 +25,13 @@
 , lastModified
 , versionString ? lastModified
 
+, inShell ? false
+, debugMode ? inShell
+
 , testWithValgrind ? true
-, fuseSupport ? false, fuse3 ? null }:
+
+, fuseSupport ? false
+, fuse3 ? null }:
 
 assert fuseSupport -> fuse3 != null;
 
@@ -86,12 +91,13 @@ stdenv.mkDerivation {
 
 	makeFlags = [
 		"PREFIX=${placeholder "out"}"
-	];
+	] ++ lib.optional debugMode "EXTRA_CFLAGS=-ggdb";
+
 	installFlags = [
 		"INITRAMFS_DIR=${placeholder "out"}/etc/initramfs-tools"
 	];
 
-
+	dontStrip = debugMode;
 	doCheck = true; # needs bcachefs module loaded on builder
 	
 	checkFlags = [ "BCACHEFS_TEST_USE_VALGRIND=${if testWithValgrind then "yes" else "no"}"];

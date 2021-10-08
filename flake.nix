@@ -23,7 +23,7 @@
 
 				self.overlay
 
-		]; }; in {
+		]; }; in rec {
 			
 			# A Nixpkgs overlay.
 
@@ -38,6 +38,10 @@
 				musl-tools = pkgs.pkgsMusl.bcachefs.tools;
 				musl-mount = pkgs.pkgsMusl.bcachefs.mount;
 			};
+
+			devShells.tools = pkgs.bcachefs.tools.override { inShell = true; };
+			devShells.mount = pkgs.bcachefs.mount.override { inShell = true; };
+			devShell = devShells.tools;
 
 			defaultPackage = pkgs.bcachefs.tools;
 		});
