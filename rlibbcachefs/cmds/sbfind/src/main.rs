@@ -8,6 +8,8 @@ struct Options {
 	// clone_disk,
 	device: std::path::PathBuf,
 	sb_offset: Option<u64>,
+	#[structopt(short,long)]
+	rewrite_superblocks: bool,
 }
 
 fn main() {
