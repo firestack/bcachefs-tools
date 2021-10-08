@@ -20,6 +20,8 @@
 #include <linux/backing-dev.h>
 #include <linux/sort.h>
 
+const uuid_le BCH_FS_MAGIC = BCACHE_MAGIC;
+
 const char * const bch2_sb_fields[] = {
 #define x(name, nr)	#name,
 	BCH_SB_FIELDS()
@@ -638,6 +640,28 @@ err:
 }
 
 /* write superblock: */
+
+void bch2_super_write_fd(int fd, struct bch_sb *sb)
+{
+	struct nonce nonce = { 0 };
+
+	unsigned i;
+	for (i = 0; i < sb->layout.nr_superblocks; i++) {
+		sb->offset = sb->layout.sb_offset[i];
+
+		if (sb->offset == BCH_SB_SECTOR) {
+			/* Write backup layout */
+			xpwrite(fd, &sb->layout, sizeof(sb->layout),
+				BCH_SB_LAYOUT_SECTOR << 9);
+		}
+
+		sb->csum = csum_vstruct(NULL, BCH_SB_CSUM_TYPE(sb), nonce, sb);
+		xpwrite(fd, sb, vstruct_bytes(sb),
+			le64_to_cpu(sb->offset) << 9);
+	}
+
+	fsync(fd);
+}
 
 static void write_super_endio(struct bio *bio)
 {

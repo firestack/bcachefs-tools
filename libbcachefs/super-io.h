@@ -133,4 +133,8 @@ void bch2_fs_mark_clean(struct bch_fs *);
 void bch2_sb_field_to_text(struct printbuf *, struct bch_sb *,
 			   struct bch_sb_field *);
 
+extern const uuid_le BCH_FS_MAGIC;
+
+void bch2_super_write_fd(int fd, struct bch_sb *sb);
+
 #endif /* _BCACHEFS_SUPER_IO_H */

@@ -41,6 +41,8 @@ fn main() {
 		// .allowlist_function("bch2_chacha_encrypt_key")
 		// .allowlist_function("__bch2_super_read")
 		.allowlist_function("bio_.*")
+		.allowlist_function("bch2_super_write_fd")
+
 		.allowlist_function("derive_passphrase")
 		.allowlist_function("request_key")
 		.allowlist_function("add_key")
