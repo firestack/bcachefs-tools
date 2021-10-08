@@ -6,6 +6,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.44"
 rlibbcachefs = { path = "../../" }
 structopt = "0.3.23"
 tracing = "0.1.29"
