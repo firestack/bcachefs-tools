@@ -17,6 +17,8 @@
 , zlib # zlib1g
 , libscrypt
 
+, rustfmt
+
 , glibc
 , ...
 }: let 
@@ -35,8 +37,9 @@ in rustPlatform.buildRustPackage {
 
 	cargoLock = { lockFile = ./Cargo.lock; };
 
-	nativeBuildInputs = [ pkg-config ];
+	nativeBuildInputs = [ rustfmt pkg-config ];
 	buildInputs = [
+		
 		# libaio
 		keyutils # libkeyutils
 		lz4 # liblz4
