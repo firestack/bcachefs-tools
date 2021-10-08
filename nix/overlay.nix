@@ -18,7 +18,7 @@ final: prev: {
 		kernel = final.callPackage ./bcachefs-kernel.nix {
 			date = "2021-08-05";
 			commit = final.bcachefs.tools.bcachefs_revision;
-			diffHash = "sha256-9NUTmC8FnXJzJ0tF2FrGW10fuGSRVq3ONdSzVmoOSTs=";
+			diffHash = "sha256-viFC3HHIcjUTDPvloSKKsz9PuSLyvxfYnrtkVUB79mQ=";
 			kernelPatches = [];
 		};
 	};
