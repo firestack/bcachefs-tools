@@ -8,21 +8,18 @@ final: prev: {
 			versionString = self.version;
 		};
 
-		mount = final.callPackage ../mount {
-		};
+		rlibbcachefs = final.callPackage ../rlibbcachefs {};
 
+		mount = final.callPackage ../rlibbcachefs/cmds/mount {};
+
+		sbfind = final.callPackage ../rlibbcachefs/cmds/sbfind {};
+
+		kernelPackages = final.recurseIntoAttrs (final.linuxPackagesFor final.bcachefs.kernel);
 		kernel = final.callPackage ./bcachefs-kernel.nix {
 			date = "2021-08-05";
 			commit = final.bcachefs.tools.bcachefs_revision;
 			diffHash = "sha256-9NUTmC8FnXJzJ0tF2FrGW10fuGSRVq3ONdSzVmoOSTs=";
 			kernelPatches = [];
 		};
-		
-		rlibbcachefs = final.callPackage ../rlibbcachefs {
-		};
-
-		sbfind = final.callPackage ../cmds/sbfind {};
-		
-		kernelPackages = final.recurseIntoAttrs (final.linuxPackagesFor final.bcachefs.kernel);
 	};
 }

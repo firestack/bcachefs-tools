@@ -14,7 +14,7 @@
 		{
 			version = "${builtins.substring 0 8 self.lastModifiedDate}-${self.shortRev or "dirty"}";
 			overlay = import ./nix/overlay.nix inputs;
-			nixosModule = import ./mount/module.nix;
+			nixosModule = import ./rlibbcachefs/cmds/mount/module.nix;
 		}
 		// utils.lib.eachSystem supportedSystems (system: 
 		let pkgs = import nixpkgs { 

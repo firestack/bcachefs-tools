@@ -45,9 +45,7 @@ stdenv.mkDerivation {
 		name = "bcachefs-tools";
 		root = ./.;
 		exclude = [
-			./mount
 			./rlibbcachefs
-			./cmds
 			
 			./.git
 			./nix

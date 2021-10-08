@@ -25,6 +25,6 @@ errno = "0.2"
 either = "1.5"
 rpassword = "4"
 camino = "1.0.5"
-rlibbcachefs = { path = "../rlibbcachefs" }
+rlibbcachefs = { path = "../../" }
 byteorder = "1.3"
 

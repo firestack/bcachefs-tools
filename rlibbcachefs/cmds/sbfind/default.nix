@@ -15,11 +15,12 @@ in {
 	pname = cargo.package.name;
 	version = cargo.package.version;
 	
-	srcs = let src = builtins.path {path = ../../.; name = "${cargo.package.name}.bcachefs-srcs";}; in map (i: src + i) [ 
-		"/cmds"
-		"/rlibbcachefs"
-	];
-	sourceRoot = "./cmds/sbfind/";
+	src = bcachefs.rlibbcachefs.src;
+	# srcs = let src = builtins.path {path = ../../.; name = "${cargo.package.name}.bcachefs-srcs";}; in map (i: src + i) [ 
+	# 	"/cmds"
+	# 	"/rlibbcachefs"
+	# ];
+	sourceRoot = "rlibbcachefs/cmds/sbfind";
 
 
 	cargoLock = { lockFile = ./Cargo.lock; };

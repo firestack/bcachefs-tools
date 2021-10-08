@@ -14,11 +14,13 @@ in {
 	pname = "mount.bcachefs";
 	version = cargo.package.version;
 	
-	srcs = let src = builtins.path {path = ../.; name = "mount.bcachefs-srcs";}; in map (i: src + i) [ 
-		"/mount"
-		"/rlibbcachefs"
-	];
-	sourceRoot = "mount/";
+	src = bcachefs.rlibbcachefs.src;
+	sourceRoot = "rlibbcachefs/cmds/mount";
+	# srcs = let 
+	#  in map (i: src + i) [ 
+	# 	"/mount"
+	# 	"/rlibbcachefs"
+	# ];
 
 
 	cargoLock = { lockFile = ./Cargo.lock; };
