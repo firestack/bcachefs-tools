@@ -19,6 +19,7 @@ fn main() {
 		tracing::error!(fatal_error=?e);
 	}
 }
+type ARResult<T> = anyhow::Result< anyhow::Result<T> >;
 
 #[tracing::instrument]
 fn inner() -> anyhow::Result<()> {
@@ -37,7 +38,7 @@ fn inner() -> anyhow::Result<()> {
 
 
 #[tracing::instrument]
-fn find_working_superblock(device: &std::path::Path, search: Option<u64>) -> RResult<rlibbcachefs::bcachefs::bch_sb_handle> {
+fn find_working_superblock(device: &std::path::Path, search: Option<u64>) -> ARResult<rlibbcachefs::bcachefs::bch_sb_handle> {
 	let offsets = vec![search.unwrap_or(8), 2056];
 	tracing::debug!(msg="searching default offsets", ?offsets);
 
@@ -53,7 +54,7 @@ fn find_working_superblock(device: &std::path::Path, search: Option<u64>) -> RRe
 }
 
 #[tracing::instrument(skip(device, blocks))]
-fn check_layout_offsets(device: &std::path::Path, blocks: &[u64]) -> RResult<Vec<rlibbcachefs::bcachefs::bch_sb_handle>> {
+fn check_layout_offsets(device: &std::path::Path, blocks: &[u64]) -> ARResult<Vec<rlibbcachefs::bcachefs::bch_sb_handle>> {
 	// tracing::info!("searching blocks");
 	let mut v = vec![];
 	
@@ -68,16 +69,11 @@ fn check_layout_offsets(device: &std::path::Path, blocks: &[u64]) -> RResult<Vec
 }
 
 #[tracing::instrument]
-fn check_sector_super(device: &std::path::Path, block: u64) -> RResult<rlibbcachefs::bcachefs::bch_sb_handle> {
-	let rhandle = c::read_superblock_from_sector(device, block)?;
+fn check_sector_super(device: &std::path::Path, block: u64) -> ARResult<rlibbcachefs::bcachefs::bch_sb_handle> {
+	let rhandle = superblock_equality_check(device, block)?;
 	match rhandle {
 		Ok(handle) => {
 			let sb = handle.sb();
-			// tracing::info!(
-			// 	uuid=?sb.uuid(),//uuid::Uuid::from_slice(&sb.layout.uuid.b[..]),
-			// 	sb_sector=?sb.offset,
-			// 	byte_offset=?sb.offset*512
-			// );
 			trace_superblock(sb);
 			Ok(Ok(handle))
 		},
@@ -90,11 +86,12 @@ fn check_sector_super(device: &std::path::Path, block: u64) -> RResult<rlibbcach
 
 fn trace_superblock(sb: &rlibbcachefs::c::bch_sb) {
 	tracing::info!(
-		uuid=?sb.uuid(),//uuid::Uuid::from_slice(&sb.layout.uuid.b[..]),
-		sb_sector=?sb.offset,
-		byte_offset=?sb.offset*512,
-		?sb.csum.lo,
-		?sb.csum.hi,
+		?sb
+		// uuid=?sb.uuid(),//uuid::Uuid::from_slice(&sb.layout.uuid.b[..]),
+		// sb_sector=?sb.offset,
+		// byte_offset=?sb.offset*512,
+		// ?sb.csum.lo,
+		// ?sb.csum.hi,
 	);
 }
 
@@ -110,7 +107,7 @@ mod c {
 		opts.set_nochanges_defined(1);
 		opts.set_noexcl_defined(1);
 		opts.set_sb_defined(1);
-	
+
 		rlibbcachefs::rs::read_super_opts(device, opts)
 	}
 
@@ -127,19 +124,28 @@ mod c {
 }
 
 mod rs {
-	pub unsafe fn _read_sector_as_superblock(device: &std::path::Path, sector: u64) -> anyhow::Result<rlibbcachefs::c::bch_sb> {
+	const SECTOR_SIZE: usize = 512;
+	// #[tracing::instrument(skip(device))]
+	pub fn read_sector_as_superblock(device: &std::path::Path, sector: u64) -> anyhow::Result<rlibbcachefs::c::bch_sb> {
 		use std::os::unix::fs::FileExt;
 		
 		let mut sb = [0; std::mem::size_of::<rlibbcachefs::c::bch_sb>()];
 	
 		std::fs::File::open(device)?
-			.read_exact_at(&mut sb, sector*512 as u64)?;
-		let sb = std::mem::transmute::<_, rlibbcachefs::c::bch_sb>(sb);
+			.read_exact_at(&mut sb, sector*SECTOR_SIZE as u64)?;
 		
-		anyhow::ensure!(sb.magic.b == rlibbcachefs::c::BCH_FS_MAGIC.b);
+		let sb = unsafe { std::mem::transmute::<_, rlibbcachefs::c::bch_sb>(sb) };
+		
+		anyhow::ensure!(sb.magic.b == unsafe{ rlibbcachefs::c::BCH_FS_MAGIC.b });
 		anyhow::ensure!(sb.offset == sector);
-		super::trace_superblock(&sb);
-		
+
 		Ok(sb)
 	}
+}
+
+fn superblock_equality_check(device: &std::path::Path, sector: u64) -> ARResult<rlibbcachefs::c::bch_sb_handle> {
+	let a = rs::read_sector_as_superblock(&device, sector)?;
+	let b = c::read_superblock_from_sector(&device, sector)??;
+	anyhow::ensure!(a == *(b.sb()));
+	Ok(Ok(b))
 }
