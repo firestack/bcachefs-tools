@@ -15,7 +15,6 @@
 , udev
 , zstd
 , lz4
-, valgrind
 
 , python39
 , python39Packages
@@ -29,12 +28,13 @@
 , debugMode ? inShell
 
 , testWithValgrind ? true
+, valgrind 
 
 , fuseSupport ? false
 , fuse3 ? null }:
 
 assert fuseSupport -> fuse3 != null;
-
+assert testWithValgrind -> valgrind != null;
 stdenv.mkDerivation {
 	pname = "bcachefs-tools";
 
@@ -86,7 +86,8 @@ stdenv.mkDerivation {
 		# documentation depenedencies
 		docutils
 		python39Packages.pygments
-	] ++ lib.optional fuseSupport fuse3;
+	] ++ (lib.optional fuseSupport fuse3)
+	++ (lib.optional testWithValgrind valgrind) ;
 
 	makeFlags = [
 		"PREFIX=${placeholder "out"}"
@@ -103,10 +104,9 @@ stdenv.mkDerivation {
 		# cannnot escape spaces within make flags
 		# "PYTEST=pytest\ --verbose\ -n4"
 	checkInputs = [
-		valgrind
 		python39Packages.pytest
 		python39Packages.pytest-xdist
-	];
+	] ++ lib.optional testWithValgrind valgrind;
 
 	preCheck =
 		''

@@ -7,6 +7,12 @@ final: prev: {
 			lastModified = builtins.substring 0 8 self.lastModifiedDate;
 			versionString = self.version;
 		};
+		toolsValgrind = final.bcachefs.tools.override {
+			testWithValgrind = true;
+		};
+		toolsDebug = final.bcachefs.toolsValgrind.override {
+			debugMode = true;
+		};
 
 		rlibbcachefs = final.callPackage ../rlibbcachefs {};
 

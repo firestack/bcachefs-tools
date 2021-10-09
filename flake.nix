@@ -32,6 +32,8 @@
 				inherit (pkgs.bcachefs)
 					mount
 					tools
+					toolsValgrind
+					toolsDebug
 					rlibbcachefs
 					sbfind
 					kernel;
@@ -41,7 +43,7 @@
 			};
 
 			checks = { inherit (packages) 
-				mount tools rlibbcachefs sbfind kernel
+				mount tools rlibbcachefs sbfind
 			; };
 
 			devShells.tools = pkgs.bcachefs.tools.override { inShell = true; };
