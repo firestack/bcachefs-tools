@@ -29,9 +29,10 @@
 		urcu = "${liburcu}/include";
 		zstd = "${zstd.dev}/include";
 	};
+	cargo = lib.trivial.importTOML ./Cargo.toml;
 in rustPlatform.buildRustPackage {
-	pname = "bcachefs-rs";
-	version = "0.0.0";
+	pname = cargo.package.name;
+	version = cargo.package.version;
 	
 	src = builtins.path { path = ./.; name = "rlibbcachefs"; };
 
