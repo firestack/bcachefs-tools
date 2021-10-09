@@ -6,7 +6,7 @@ jobs:
   tests:
     strategy:
       matrix:
-        package: [ tools mount sbfind ]
+        package: [ tools, mount, sbfind ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2.3.4
