@@ -29,6 +29,32 @@ impl bch_sb_field_crypt {
 		&self.key
 	}
 }
+impl PartialEq for bch_sb {
+	fn eq(&self, other: &Self) -> bool {
+		self.magic.b == other.magic.b
+		&& self.user_uuid.b == other.user_uuid.b
+		&& self.block_size == other.block_size
+		&& self.version == other.version
+		&& self.uuid.b == other.uuid.b
+		&& self.seq == other.seq
+	}
+}
+
+impl std::fmt::Debug for bch_sb {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		f.debug_struct("bch_sb")
+			.field("uuid", &self.uuid())
+			.field("version", &(self.version, self.version_min))
+			.field("block_size", &self.block_size)
+			.field("device_idx", &self.dev_idx)
+			.field("seq", &self.seq)
+			.field("csum", &(self.csum.lo, self.csum.hi))
+			.field("offset", &self.offset)
+		.finish_non_exhaustive()
+    }
+}
+
+
 impl bch_sb {
 	pub fn crypt(&self) -> Option<&bch_sb_field_crypt> {
 		unsafe {

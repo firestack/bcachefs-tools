@@ -24,6 +24,7 @@ fn main() {
 		.clang_arg("-D_GNU_SOURCE")
 		.derive_debug(true)
 		.derive_default(true)
+		.derive_eq(true)
 		.layout_tests(true)
 		.default_enum_style(bindgen::EnumVariation::Rust { non_exhaustive: true })
 		.allowlist_function(".*bch2_.*")
