@@ -2,6 +2,7 @@ PREFIX?=/usr/local
 PKG_CONFIG?=pkg-config
 INSTALL=install
 PYTEST=pytest-3
+RST2MAN=rst2man
 CFLAGS+=-std=gnu89 -O2 -g -MMD -Wall				\
 	-Wno-pointer-sign					\
 	-fno-strict-aliasing					\
@@ -59,16 +60,6 @@ ifeq ($(PREFIX),/usr)
 else
 	ROOT_SBINDIR=$(PREFIX)/sbin
 	INITRAMFS_DIR=/etc/initramfs-tools
-endif
-
-STATUS:=$(shell rst2man -V &>/dev/null; echo $$?)
-ifeq ($(STATUS),0)
-	RST2MAN=rst2man
-endif
-
-STATUS:=$(shell rst2man.py -V &>/dev/null; echo $$?)
-ifeq ($(STATUS),0)
-	RST2MAN=rst2man.py
 endif
 
 .PHONY: all
