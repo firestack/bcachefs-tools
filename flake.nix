@@ -67,11 +67,13 @@
 			defaultPackage = pkgs.bcachefs.tools;
 			packages = {
 				inherit (pkgs.bcachefs)
-					mount
 					tools
 					toolsValgrind
 					toolsDebug
+					mount
 					bch_bindgen
+					sbfind
+					rlibbcachefs
 					kernel;
 
 				musl-tools = pkgs.pkgsMusl.bcachefs.tools;

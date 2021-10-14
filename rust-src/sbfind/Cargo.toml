@@ -7,7 +7,7 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0.44"
-rlibbcachefs = { path = "../../" }
+bch_bindgen = { path = "../bch_bindgen/" }
 structopt = "0.3.23"
 tracing = "0.1.29"
 tracing-subscriber = "0.2.25"

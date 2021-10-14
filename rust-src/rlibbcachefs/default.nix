@@ -6,7 +6,6 @@
 , rustPlatform
 
 , bcachefs
-, self
 
 , ...
 }: rustPlatform.buildRustPackage ( let 
@@ -15,32 +14,22 @@ in {
 	pname = cargo.package.name;
 	version = cargo.package.version;
 	
-	src = bcachefs.mount.src;
-	# srcs = let src = builtins.path {path = ../../.; name = "${cargo.package.name}.bcachefs-srcs";}; in map (i: src + i) [ 
-	# 	"/cmds"
-	# 	"/rlibbcachefs"
-	# ];
-	sourceRoot = "rust-src/sbfind";
-
+	src = builtins.path { path = ../.; name = "rlibbcachefs"; };
+	sourceRoot = "rust-src/rlibbcachefs";
 
 	cargoLock = { lockFile = ./Cargo.lock; };
 
 	nativeBuildInputs = bcachefs.bch_bindgen.nativeBuildInputs;
 	buildInputs = bcachefs.bch_bindgen.buildInputs;
 	inherit (bcachefs.bch_bindgen)
-		LIBBCACHEFS_INCLUDE
-		LIBBCACHEFS_LIB
 		LIBCLANG_PATH
 		BINDGEN_EXTRA_CLANG_ARGS;
 
-	# postPatch = ''
-	# 	cp ${./Cargo.lock} Cargo.lock
-	# '';
-	
 	# -isystem ${llvmPackages.libclang.lib}/lib/clang/${lib.getVersion llvmPackages.libclang}/include";
 	# CFLAGS = "-I${llvmPackages.libclang.lib}/include";
 	# LDFLAGS = "-L${libcdev}";
 
 	doCheck = false;
-	# NIX_DEBUG = 6;
+	
+	# NIX_DEBUG = 4;
 })
