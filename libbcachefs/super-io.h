@@ -9,6 +9,8 @@
 
 #include <asm/byteorder.h>
 
+extern const uuid_le BCH_FS_MAGIC;
+
 struct bch_sb_field *bch2_sb_field_get(struct bch_sb *, enum bch_sb_field_type);
 struct bch_sb_field *bch2_sb_field_resize(struct bch_sb_handle *,
 					  enum bch_sb_field_type, unsigned);

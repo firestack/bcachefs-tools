@@ -20,6 +20,7 @@
 #include <linux/backing-dev.h>
 #include <linux/sort.h>
 
+const uuid_le BCH_FS_MAGIC = BCACHE_MAGIC;
 const char * const bch2_sb_fields[] = {
 #define x(name, nr)	#name,
 	BCH_SB_FIELDS()
@@ -201,6 +202,7 @@ static inline void __bch2_sb_layout_size_assert(void)
 {
 	BUILD_BUG_ON(sizeof(struct bch_sb_layout) != 512);
 }
+
 
 static const char *validate_sb_layout(struct bch_sb_layout *layout)
 {
