@@ -1,3 +1,7 @@
+pub const SUPERBLOCK_MAGIC: uuid::Uuid = uuid::Uuid::from_u128(
+	0x_c68573f6_4e1a_45ca_8265_f57f48ba6d81
+);
+
 mod rs {
 	const SECTOR_SIZE: usize = 512;bch_sb {
 	// #[tracing::instrument(skip(device))]
