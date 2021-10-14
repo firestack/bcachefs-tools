@@ -44,6 +44,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
+name = "bch_bindgen"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bindgen",
+ "bitfield",
+ "byteorder",
+ "gag",
+ "libc",
+ "memoffset",
+ "pkg-config",
+ "tracing",
+ "tracing-attributes",
+ "udev",
+ "uuid",
+]
+
+[[package]]
 name = "bindgen"
 version = "0.59.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -465,24 +483,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rlibbcachefs"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bindgen",
- "bitfield",
- "byteorder",
- "gag",
- "libc",
- "memoffset",
- "pkg-config",
- "tracing",
- "tracing-attributes",
- "udev",
- "uuid",
-]
-
-[[package]]
 name = "rustc-hash"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -499,7 +499,7 @@ name = "sbfind"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "rlibbcachefs",
+ "bch_bindgen",
  "structopt",
  "tracing",
  "tracing-subscriber",
