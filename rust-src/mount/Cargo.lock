@@ -57,6 +57,7 @@ name = "bcachefs-mount"
 version = "0.2.0"
 dependencies = [
  "anyhow",
+ "bch_bindgen",
  "byteorder",
  "camino",
  "clap",
@@ -67,13 +68,30 @@ dependencies = [
  "itertools",
  "libc",
  "parse-display",
- "rlibbcachefs",
  "rpassword",
  "structopt",
  "tracing",
  "tracing-attributes",
  "tracing-log",
  "tracing-subscriber",
+ "udev",
+ "uuid",
+]
+
+[[package]]
+name = "bch_bindgen"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bindgen",
+ "bitfield",
+ "byteorder",
+ "gag",
+ "libc",
+ "memoffset",
+ "pkg-config",
+ "tracing",
+ "tracing-attributes",
  "udev",
  "uuid",
 ]
@@ -612,24 +630,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4a83fa3702a688b9359eccba92d153ac33fd2e8462f9e0e3fdf155239ea7792e"
 dependencies = [
  "winapi",
-]
-
-[[package]]
-name = "rlibbcachefs"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bindgen",
- "bitfield",
- "byteorder",
- "gag",
- "libc",
- "memoffset",
- "pkg-config",
- "tracing",
- "tracing-attributes",
- "udev",
- "uuid",
 ]
 
 [[package]]
