@@ -20,7 +20,13 @@ CFLAGS+=-std=gnu89 -O2 -g -MMD -Wall				\
 	-DVERSION_STRING='"$(VERSION)"'				\
 	$(EXTRA_CFLAGS)
 LDFLAGS+=$(CFLAGS) $(EXTRA_LDFLAGS)
+CARGO_ARGS=
+CARGO=cargo $(CARGO_ARGS)
+CARGO_PROFILE=release
+# CARGO_PROFILE=debug
 
+CARGO_BUILD_ARGS=--$(CARGO_PROFILE)
+CARGO_BUILD=$(CARGO) build $(CARGO_BUILD_ARGS)
 VERSION?=$(shell git describe --dirty=+ 2>/dev/null || echo v0.1-nogit)
 
 include Makefile.compiler
@@ -63,7 +69,10 @@ else
 endif
 
 .PHONY: all
-all: bcachefs bcachefs.5
+all: bcachefs bcachefs.5 lib
+
+.PHONY: lib
+lib: libbcachefs.so
 
 .PHONY: tests
 tests: tests/test_helper
@@ -98,19 +107,35 @@ DEPS=$(SRCS:.c=.d)
 OBJS=$(SRCS:.c=.o)
 bcachefs: $(filter-out ./tests/%.o, $(OBJS))
 
-MOUNT_SRCS=$(shell find mount/src -type f -iname '*.rs') \
-    mount/Cargo.toml mount/Cargo.lock mount/build.rs
+RUST_SRCS=$(shell find rust-src/ -type f -iname '*.rs')
+RUST_PROJECTS=$(shell find rust-src/ -type f -iname 'Cargo.toml')
+
+MOUNT_SRCS=$(filter %mount, $(RUST_SRCS))
 
 debug: CFLAGS+=-Werror -DCONFIG_BCACHEFS_DEBUG=y -DCONFIG_VALGRIND=y
 debug: bcachefs
 
 libbcachefs_mount.a: $(MOUNT_SRCS)
-	LIBBCACHEFS_INCLUDE=$(CURDIR) cargo build --manifest-path mount/Cargo.toml --release
+	LIBBCACHEFS_INCLUDE=$(CURDIR) \
+	$(CARGO_BUILD) --manifest-path rust-src/mount/Cargo.toml
 	cp mount/target/release/libbcachefs_mount.a $@
 
+rlibbcachefs.a:
+	$(CARGO_BUILD) --manifest-path rust-src/rlibbcachefs/Cargo.toml
+
 MOUNT_OBJ=$(filter-out ./bcachefs.o ./tests/%.o ./cmd_%.o , $(OBJS))
-mount.bcachefs: libbcachefs_mount.a $(MOUNT_OBJ)
-	$(CC) -Wl,--gc-sections libbcachefs_mount.a $(MOUNT_OBJ) -o $@ $(LDLIBS)
+
+libbcachefs.so: LDFLAGS+=-shared
+libbcachefs.so: $(MOUNT_OBJ)
+	$(CC) $(LDFLAGS) $+ -o $@ $(LDLIBS)
+
+MOUNT_TOML=$(filter %mount, $(RUST_PROJECTS))
+mount.bcachefs:
+mount.bcachefs: lib
+	LIBBCACHEFS_LIB=$(CURDIR) \
+	LIBBCACHEFS_INCLUDE=$(CURDIR) \
+	$(CARGO_BUILD) --manifest-path rust-src/mount/Cargo.toml
+	ln -f rust-src/mount/target/$(CARGO_PROFILE)/mount-bcachefs $@
 
 tests/test_helper: $(filter ./tests/%.o, $(OBJS))
 
@@ -127,7 +152,7 @@ cmd_version.o : .version
 .PHONY: install
 install: INITRAMFS_HOOK=$(INITRAMFS_DIR)/hooks/bcachefs
 install: INITRAMFS_SCRIPT=$(INITRAMFS_DIR)/scripts/local-premount/bcachefs
-install: bcachefs
+install: bcachefs lib
 	$(INSTALL) -m0755 -D bcachefs      -t $(DESTDIR)$(ROOT_SBINDIR)
 	$(INSTALL) -m0755    fsck.bcachefs    $(DESTDIR)$(ROOT_SBINDIR)
 	$(INSTALL) -m0755    mkfs.bcachefs    $(DESTDIR)$(ROOT_SBINDIR)
@@ -135,13 +160,15 @@ install: bcachefs
 	$(INSTALL) -m0755 -D initramfs/script $(DESTDIR)$(INITRAMFS_SCRIPT)
 	$(INSTALL) -m0755 -D initramfs/hook   $(DESTDIR)$(INITRAMFS_HOOK)
 	$(INSTALL) -m0755 -D mount.bcachefs.sh $(DESTDIR)$(ROOT_SBINDIR)
+	$(INSTALL) -m0755 -D libbcachefs.so -t $(PREFIX)/lib/
+  
 	sed -i '/^# Note: make install replaces/,$$d' $(DESTDIR)$(INITRAMFS_HOOK)
 	echo "copy_exec $(ROOT_SBINDIR)/bcachefs /sbin/bcachefs" >> $(DESTDIR)$(INITRAMFS_HOOK)
 
 .PHONY: clean
 clean:
 	$(RM) bcachefs mount.bcachefs libbcachefs_mount.a tests/test_helper .version $(OBJS) $(DEPS) $(DOCGENERATED)
-	$(RM) -rf mount/target
+	$(RM) -rf rust-src/*/target
 
 .PHONY: deb
 deb: all
