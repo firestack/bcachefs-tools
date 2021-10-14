@@ -42,9 +42,20 @@
 				kernelSrc = packages.kernel.src;
 				inherit (packages) 
 					toolsValgrind;
+
+				# Build and test initrd with bcachefs and bcachefs.mount installed
+				bootStage1Module = (nixpkgs.lib.nixosSystem { 
+					inherit system; 
+					modules = [ 
+						("${nixpkgs}/nixos/modules/installer/netboot/netboot.nix")
+						self.nixosModule 
+						self.nixosModules.bcachefs-enable-boot
+					]; 
+				}).config.system.build.bootStage1;
 			};
 
 			devShell = devShells.tools;
 			devShells.tools = pkgs.bcachefs.tools.override { inShell = true; };
+			devShells.mount = pkgs.bcachefs.mount.override { inShell = true; };
 		});
 }
