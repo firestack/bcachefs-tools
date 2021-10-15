@@ -14,7 +14,7 @@ in {
 	pname = cargo.package.name;
 	version = cargo.package.version;
 	
-	src = builtins.path { path = ../.; name = "rlibbcachefs"; };
+	src = builtins.path { path = ../.; name = "rust-src"; };
 	sourceRoot = "rust-src/rlibbcachefs";
 
 	cargoLock = { lockFile = ./Cargo.lock; };
@@ -22,6 +22,8 @@ in {
 	nativeBuildInputs = bcachefs.bch_bindgen.nativeBuildInputs;
 	buildInputs = bcachefs.bch_bindgen.buildInputs;
 	inherit (bcachefs.bch_bindgen)
+		LIBBCACHEFS_INCLUDE
+		LIBBCACHEFS_LIB
 		LIBCLANG_PATH
 		BINDGEN_EXTRA_CLANG_ARGS;
 
