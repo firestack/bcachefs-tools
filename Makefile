@@ -122,6 +122,7 @@ libbcachefs_mount.a: $(MOUNT_SRCS)
 
 rlibbcachefs.a:
 	$(CARGO_BUILD) --manifest-path rust-src/rlibbcachefs/Cargo.toml
+	cp rust-src/rlibbcachefs/target/$(CARGO_PROFILE)/rlibbcachefs.a $@
 
 MOUNT_OBJ=$(filter-out ./bcachefs.o ./tests/%.o ./cmd_%.o , $(OBJS))
 
