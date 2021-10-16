@@ -83,7 +83,12 @@
 			checks = { 
 				kernelSrc = packages.kernel.src;
 				inherit (packages) 
-					toolsValgrind;
+					toolsValgrind
+					mount
+					bch_bindgen
+					sbfind
+					rlibbcachefs
+				;
 
 				# Build and test initrd with bcachefs and bcachefs.mount installed
 				bootStage1Module = (nixpkgs.lib.nixosSystem { 
