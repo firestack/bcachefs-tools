@@ -913,10 +913,7 @@ struct bch_stripe {
 struct bch_reflink_p {
 	struct bch_val		v;
 	__le64			idx;
-
-	__le32			reservation_generation;
-	__u8			nr_replicas;
-	__u8			pad[3];
+	__le64			v2;
 };
 
 struct bch_reflink_v {
