@@ -35,7 +35,6 @@
 					kernel;
 
 				musl-tools = pkgs.pkgsMusl.bcachefs.tools;
-				musl-mount = pkgs.pkgsMusl.bcachefs.mount;
 			};
 
 			checks = { 
