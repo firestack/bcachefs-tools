@@ -22,7 +22,7 @@ final: prev: {
 		kernel = final.callPackage ./bcachefs-kernel.nix {
 			commit = final.bcachefs.tools.bcachefs_revision;
 			# This needs to be recalculated for every revision change
-			diffHash = "sha256-XSA0dBZZL8RXplgjpoLOFSULM8t/0Ztz8xlhLn9hdyw=";
+			diffHash = "sha256-mrCw0wC19j0xTAnE8FxzoLTLbOhX1ust15xA6+yZjnQ=";
 			kernelPatches = [];
 		};
 	};
