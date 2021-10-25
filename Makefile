@@ -8,6 +8,7 @@ CFLAGS+=-std=gnu89 -O2 -g -MMD -Wall -fPIC				\
 	-fno-strict-aliasing					\
 	-fno-delete-null-pointer-checks				\
 	-I. -Iinclude -Iraid					\
+	-I./rust-src/rbcachefs/include \
 	-D_FILE_OFFSET_BITS=64					\
 	-D_GNU_SOURCE						\
 	-D_LGPL_SOURCE						\
@@ -89,10 +90,8 @@ else
 endif
 
 .PHONY: all
-all: bcachefs bcachefs.5 lib
+all: bcachefs bcachefs.5
 
-.PHONY: lib
-lib: libbcachefs.so
 
 .PHONY: tests
 tests: tests/test_helper
@@ -128,7 +127,7 @@ SRCS=$(shell find . -type f -iname '*.c')
 DEPS=$(SRCS:.c=.d)
 -include $(DEPS)
 
-OBJS=$(SRCS:.c=.o)
+OBJS=$(SRCS:.c=.o) librbcachefs.a
 bcachefs: $(filter-out ./tests/%.o, $(OBJS))
 
 mount.bcachefs: bcachefs
@@ -150,6 +149,9 @@ debug: bcachefs
 doc:
 	$(CARGO) doc --manifest-path rust-src/rbcachefs/Cargo.toml
 
+librbcachefs.a: $(RUST_SRCS)
+	$(CARGO_BUILD) --manifest-path rust-src/rbcachefs/Cargo.toml
+	$(LN) -f rust-src/rbcachefs/target/$(CARGO_PROFILE_DIR)/librbcachefs.a $@
 
 tests/test_helper: $(filter ./tests/%.o, $(OBJS))
 

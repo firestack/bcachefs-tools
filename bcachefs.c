@@ -168,6 +168,7 @@ static int subvolume_cmds(int argc, char *argv[])
 	return 0;
 }
 
+#include <rbcachefs_bindings.h>
 int main(int argc, char *argv[])
 {
 	raid_init();
