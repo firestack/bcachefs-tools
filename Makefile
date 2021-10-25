@@ -2,6 +2,7 @@ PREFIX?=/usr/local
 PKG_CONFIG?=pkg-config
 INSTALL=install
 
+LN=ln
 CFLAGS+=-std=gnu89 -O2 -g -MMD -Wall -fPIC				\
 	-Wno-pointer-sign					\
 	-fno-strict-aliasing					\
@@ -127,6 +128,15 @@ DEPS=$(SRCS:.c=.d)
 OBJS=$(SRCS:.c=.o)
 bcachefs: $(filter-out ./tests/%.o, $(OBJS))
 
+mount.bcachefs: bcachefs
+	$(LN) -f $+ $@
+
+sb_recover: bcachefs
+	$(LN) -f $+ $@
+
+fsck.bcachefs: bcachefs
+	$(LN) -f $+ $@
+
 RUST_SRCS=$(shell find rust-src/ -type f -iname '*.rs')
 MOUNT_SRCS=$(filter %mount, $(RUST_SRCS))
 
@@ -162,15 +172,16 @@ cmd_version.o : .version
 .PHONY: install
 install: INITRAMFS_HOOK=$(INITRAMFS_DIR)/hooks/bcachefs
 install: INITRAMFS_SCRIPT=$(INITRAMFS_DIR)/scripts/local-premount/bcachefs
-install: bcachefs lib
+install: bcachefs
 	$(INSTALL) -m0755 -D bcachefs      -t $(DESTDIR)$(ROOT_SBINDIR)
-	$(INSTALL) -m0755    fsck.bcachefs    $(DESTDIR)$(ROOT_SBINDIR)
+	$(LN) -s $(DESTDIR)$(ROOT_SBINDIR)/bcachefs $(DESTDIR)$(ROOT_SBINDIR)/mount.bcachefs
+	$(LN) -s $(DESTDIR)$(ROOT_SBINDIR)/bcachefs $(DESTDIR)$(ROOT_SBINDIR)/fsck.bcachefs
+	$(LN) -s $(DESTDIR)$(ROOT_SBINDIR)/bcachefs $(DESTDIR)$(ROOT_SBINDIR)/sb_recover
 	$(INSTALL) -m0755    mkfs.bcachefs    $(DESTDIR)$(ROOT_SBINDIR)
 	$(INSTALL) -m0644 -D bcachefs.8    -t $(DESTDIR)$(PREFIX)/share/man/man8/
 	$(INSTALL) -m0755 -D initramfs/script $(DESTDIR)$(INITRAMFS_SCRIPT)
 	$(INSTALL) -m0755 -D initramfs/hook   $(DESTDIR)$(INITRAMFS_HOOK)
 	$(INSTALL) -m0755 -D mount.bcachefs.sh $(DESTDIR)$(ROOT_SBINDIR)
-	$(INSTALL) -m0755 -D libbcachefs.so -t $(DESTDIR)$(PREFIX)/lib/
   
 	sed -i '/^# Note: make install replaces/,$$d' $(DESTDIR)$(INITRAMFS_HOOK)
 	echo "copy_exec $(ROOT_SBINDIR)/bcachefs /sbin/bcachefs" >> $(DESTDIR)$(INITRAMFS_HOOK)
