@@ -89,6 +89,7 @@ static void usage(void)
 }
 
 static char *full_cmd;
+static int cmd_idx = 1;
 
 static char *pop_cmd(int *argc, char *argv[])
 {
