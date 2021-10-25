@@ -169,6 +169,14 @@ static int subvolume_cmds(int argc, char *argv[])
 }
 
 #include <rbcachefs_bindings.h>
+
+static bool str_ends_with(char *lhs, char *rhs) {
+	u_int16_t llen = strlen(lhs); 
+	u_int16_t rlen = strlen(rhs);
+	char *tmp = &lhs[llen - rlen];
+	return strcmp(tmp, rhs) == 0;
+}
+
 int main(int argc, char *argv[])
 {
 	raid_init();
