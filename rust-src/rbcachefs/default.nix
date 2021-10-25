@@ -71,7 +71,7 @@ in rustPlatform.buildRustPackage {
 		cp $src/include/* $out/include
 	'';
 	
-	LIBBCACHEFS_LIB ="${bcachefs.toolsSrc}/lib";
+	LIBBCACHEFS_LIB = "${bcachefs.toolsSrc}/lib";
 	LIBBCACHEFS_INCLUDE = bcachefs.tools.src;
 	LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
 	BINDGEN_EXTRA_CLANG_ARGS = lib.replaceStrings ["\n" "\t"] [" " ""] ''
