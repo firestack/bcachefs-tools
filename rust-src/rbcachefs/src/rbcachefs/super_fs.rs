@@ -16,8 +16,11 @@ impl bcachefs::bch_fs {
 		fs
 	}
 }
+
 // impl Drop for bcachefs::bch_fs {
 // 	fn drop(&mut self) {
-// 		todo!()
+// 		unsafe {
+// 			bcachefs::bch2_fs_free(self);
+// 		}
 // 	}
 // }
