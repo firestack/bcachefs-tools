@@ -19,3 +19,4 @@ tests/__pycache__/
 mount/target
 mount.bcachefs
 doc/bcachefs.5.rst
+sb_recover
