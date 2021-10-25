@@ -1,12 +1,9 @@
 use structopt::StructOpt;
 
 use crate::call_err_fn_for_c;
-/// sb_recover - a utility to read expected superblocks and recover superblocks
+/// sb_recover
+/// a utility to read expected superblocks and recover superblocks
 #[derive(StructOpt, Debug)]
-#[structopt(
-	name = "sbfind",
-	about = "A utility to read all expected superblocks possibly based on another disk"
-)]
 struct Options {
 	// clone_disk,
 	device: std::path::PathBuf,
