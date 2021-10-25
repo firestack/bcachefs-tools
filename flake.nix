@@ -69,19 +69,16 @@
 					tools
 					toolsValgrind
 					toolsDebug
-					mount
-					bch_bindgen
+					rbcachefs
 					kernel;
 
 				tools-musl = pkgs.pkgsMusl.bcachefs.tools;
-				mount-musl = pkgs.pkgsMusl.bcachefs.mount;
 			};
 
 			checks = { 
 				kernelSrc = packages.kernel.src;
 				inherit (packages) 
-					mount
-					bch_bindgen
+					rbcachefs
 					toolsValgrind;
 
 				# Build and test initrd with bcachefs and bcachefs.mount installed
@@ -91,6 +88,6 @@
 
 			devShell = devShells.tools;
 			devShells.tools = pkgs.bcachefs.tools.override { inShell = true; };
-			devShells.mount = pkgs.bcachefs.mount.override { inShell = true; };
+			devShells.rbcachefs = pkgs.bcachefs.rbcachefs.override { inShell = true; };
 		});
 }

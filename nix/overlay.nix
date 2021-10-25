@@ -1,6 +1,8 @@
 { filter, self, ... }:
 final: prev: {
 	bcachefs = {
+		toolsSrc = builtins.path { path = ../.; name = "bcachefs-tools"; };
+
 		tools = final.callPackage ../default.nix {
 			testWithValgrind = false;
 			filter = filter.lib;
@@ -14,9 +16,7 @@ final: prev: {
 			debugMode = true;
 		};
 
-		bch_bindgen = final.callPackage ../rust-src/bch_bindgen {};
-
-		mount = final.callPackage ../rust-src/mount {};
+		rbcachefs = final.callPackage ../rust-src/rbcachefs {};
 
 		kernelPackages = final.recurseIntoAttrs (final.linuxPackagesFor final.bcachefs.kernel);
 		kernel = final.callPackage ./bcachefs-kernel.nix {

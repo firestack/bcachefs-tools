@@ -20,6 +20,7 @@
 , docutils
 , nixosTests
 
+, bcachefs
 , lastModified
 , versionString ? lastModified
 
@@ -56,6 +57,9 @@ stdenv.mkDerivation {
 
 	postPatch = "patchShebangs --build doc/macro2rst.py";
 
+	preBuild = ''
+		cp --reflink=auto ${bcachefs.rbcachefs}/lib/librbcachefs.a .
+	'';
 	nativeBuildInputs = [
 		# used to find dependencies
 		## see ./INSTALL
