@@ -181,10 +181,21 @@ int main(int argc, char *argv[])
 {
 	raid_init();
 
-	full_cmd = argv[0];
-
+	char *arg0 = full_cmd = argv[0];
 	setvbuf(stdout, NULL, _IOLBF, 0);
 
+	// Multi Call Binary
+	if (str_ends_with(arg0, "mount.bcachefs")) {
+		return RS_mount_main();
+	}
+	if (str_ends_with(arg0, "fsck.bcachefs")) {
+		return RS_cmd_fsck_main();
+	}
+	if (str_ends_with(arg0, "sb_recover")) {
+		return RS_cmd_sb_recover_main();
+	}
+
+	// Bcachefs binary call
 	char *cmd = pop_cmd(&argc, argv);
 	if (argc < 1) {
 		puts("missing command\n");
