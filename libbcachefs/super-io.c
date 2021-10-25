@@ -20,6 +20,12 @@
 #include <linux/backing-dev.h>
 #include <linux/sort.h>
 
+
+
+const uuid_le BCACHEFS_SB_MAGIC = BCACHE_MAGIC;
+const __le64 BCACHEFS_JSET_MAGIC = JSET_MAGIC;
+const __le64 BCACHEFS_BSET_MAGIC = BSET_MAGIC;
+
 const char * const bch2_sb_fields[] = {
 #define x(name, nr)	#name,
 	BCH_SB_FIELDS()
