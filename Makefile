@@ -40,10 +40,13 @@ RST2MAN:=$(RST2MAN_CMD) $(RST2MAN_ARGS)
 
 CARGO_ARGS=
 CARGO=cargo $(CARGO_ARGS)
-CARGO_PROFILE=release
-# CARGO_PROFILE=debug
+# default is debug
+# set to debug for default profile
+CARGO_PROFILE_DIR?=release
+# Unset for default profile
+CARGO_PROFILE?=--release
 
-CARGO_BUILD_ARGS=--$(CARGO_PROFILE)
+CARGO_BUILD_ARGS=$(CARGO_PROFILE)
 CARGO_BUILD=$(CARGO) build $(CARGO_BUILD_ARGS)
 VERSION?=$(shell git describe --dirty=+ 2>/dev/null || echo v0.1-nogit)
 
@@ -143,18 +146,9 @@ MOUNT_SRCS=$(filter %mount, $(RUST_SRCS))
 debug: CFLAGS+=-Werror -DCONFIG_BCACHEFS_DEBUG=y -DCONFIG_VALGRIND=y
 debug: bcachefs
 
-MOUNT_OBJ=$(filter-out ./bcachefs.o ./tests/%.o ./cmd_%.o , $(OBJS))
-libbcachefs.so: LDFLAGS+=-shared
-libbcachefs.so: $(MOUNT_OBJ)
-	$(CC) $(LDFLAGS) $+ -o $@ $(LDLIBS)
-
-MOUNT_TOML=rust-src/mount/Cargo.toml
-mount.bcachefs: lib $(MOUNT_SRCS)
-	LIBBCACHEFS_LIB=$(CURDIR) \
-	LIBBCACHEFS_INCLUDE=$(CURDIR) \
-	$(CARGO_BUILD) --manifest-path $(MOUNT_TOML)
-
-	ln -f rust-src/mount/target/$(CARGO_PROFILE)/bcachefs-mount $@
+.PHONY: doc
+doc:
+	$(CARGO) doc --manifest-path rust-src/rbcachefs/Cargo.toml
 
 
 tests/test_helper: $(filter ./tests/%.o, $(OBJS))
