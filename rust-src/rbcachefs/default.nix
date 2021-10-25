@@ -35,6 +35,8 @@
 			zstd = "${zstd.dev}/include";
 			blkid = "${util-linux.dev}/include/blkid";
 			util-linux = "${util-linux.dev}/include";
+			bcachefs = "${bcachefs.toolsSrc}";
+			bcachefs-include = "${bcachefs.toolsSrc}/include";
 
 		};
 
