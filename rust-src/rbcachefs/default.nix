@@ -65,6 +65,11 @@ in rustPlatform.buildRustPackage {
 		libaio
 		util-linux.dev
 	];
+
+	postInstall = ''
+		mkdir $out/include
+		cp $src/include/* $out/include
+	'';
 	
 	LIBBCACHEFS_LIB ="${bcachefs.toolsSrc}/lib";
 	LIBBCACHEFS_INCLUDE = bcachefs.tools.src;
