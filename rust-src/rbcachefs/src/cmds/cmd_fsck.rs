@@ -97,9 +97,8 @@ fn fsck() -> anyhow::Result<()> {
 
 	let opts = mk_opts(&args);
 	let c_fs = crate::c::bcachefs::bch_fs::new(devs.as_slice(), opts);
-	dbg!(c_fs as i64);
-	if c_fs <= std::ptr::null_mut() {
-		panic!("");
+	if (c_fs as i64) < 4096 {
+		anyhow::bail!("ew, bad");
 	}
 	// struct bch_fs *c = bch2_fs_open(argv, argc, opts);
 	// if (IS_ERR(c)) {
