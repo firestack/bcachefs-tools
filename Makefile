@@ -24,17 +24,17 @@ LDFLAGS+=$(CFLAGS) $(EXTRA_LDFLAGS)
 ## Configure Tools
 PYTEST_ARGS?=
 PYTEST_CMD?=$(shell \
-	command -v pytest-3 \
-	|| which pytest-3 \
+	command -v pytest-3 2>/dev/null \
+	|| which pytest-3 2>/dev/null \
 )
 PYTEST:=$(PYTEST_CMD) $(PYTEST_ARGS)
 
 RST2MAN_ARGS?=
 RST2MAN_CMD?=$(shell \
 	command -v rst2man \
-	|| which rst2man \
+	|| which rst2man 2>/dev/null \
 	|| command -v rst2man.py \
-	|| which rst2man.py \
+	|| which rst2man.py 2>/dev/null \
 )
 RST2MAN:=$(RST2MAN_CMD) $(RST2MAN_ARGS)
 
