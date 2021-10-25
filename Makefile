@@ -1,6 +1,7 @@
 PREFIX?=/usr/local
 PKG_CONFIG?=pkg-config
 INSTALL=install
+RS_INCLUDE?=./rust-src/rbcachefs/include
 
 LN=ln
 CFLAGS+=-std=gnu89 -O2 -g -MMD -Wall -fPIC				\
@@ -8,7 +9,7 @@ CFLAGS+=-std=gnu89 -O2 -g -MMD -Wall -fPIC				\
 	-fno-strict-aliasing					\
 	-fno-delete-null-pointer-checks				\
 	-I. -Iinclude -Iraid					\
-	-I./rust-src/rbcachefs/include \
+	-I$(RS_INCLUDE) \
 	-D_FILE_OFFSET_BITS=64					\
 	-D_GNU_SOURCE						\
 	-D_LGPL_SOURCE						\
