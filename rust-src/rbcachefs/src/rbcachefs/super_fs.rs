@@ -10,6 +10,9 @@ impl bcachefs::bch_fs {
 			.collect();
 
 		let fs = unsafe { bcachefs::bch2_fs_open(cstrs.as_ptr(), cstrs.len() as u32, opts) };
+		unsafe {
+			cstrs.into_iter().map(|i| std::ffi::CString::from_raw(i)).last();
+		}
 		fs
 	}
 }
