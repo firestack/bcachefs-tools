@@ -92,6 +92,8 @@ endif
 .PHONY: all
 all: bcachefs bcachefs.5
 
+.PHONY: rust
+rust:  mount.bcachefs fsck.bcachefs sb_recover
 
 .PHONY: tests
 tests: tests/test_helper
