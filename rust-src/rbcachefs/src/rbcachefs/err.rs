@@ -3,19 +3,28 @@ const MAX_ERROR_NO: isize = 4095;
 
 // #define IS_ERR_VALUE(x) unlikely((x) >= (unsigned long)-MAX_ERRNO)
 
-#[tracing::instrument]
 fn is_error_value(val: isize) -> bool {
-   tracing::info!("ptr");
    val <= MAX_ERROR_NO
 }
 
-pub type Error = isize;
-pub type Result<T> = std::result::Result<T, Error>;
+struct ErrorStruct {
+   error_value: i32,
 
-#[tracing::instrument]
-pub fn ptr_result<'ptr, T>(ptr: *mut T ) -> Result<&'ptr mut T> {
+
+}
+// impl Error for ErrorStruct 
+
+#[tracing::instrument(err)]
+pub fn ptr_result<'ptr, T>(ptr: *mut T ) -> anyhow::Result<&'ptr mut T> {
    match is_error_value(ptr as isize) {
-      true => Err(ptr as isize),
-      false => Ok(unsafe { &mut *ptr })
+      false => Ok(unsafe { &mut *ptr }),
+      true => {
+         // Documentation says strerror strings are supposed
+         // To be 'static
+         let c = unsafe {
+            std::ffi::CStr::from_ptr( libc::strerror(-(ptr as i32)) )
+         };
+         Err(anyhow::anyhow!(c.to_string_lossy()))
+      },
    }
 }

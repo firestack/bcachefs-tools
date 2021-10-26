@@ -16,7 +16,7 @@ impl bcachefs::bch_fs {
 		fs
 	}
 
-	pub fn try_new(devices: &[Vec<u8>], opts: bcachefs::bch_opts) -> crate::rbcachefs::err::Result<&mut Self> {
+	pub fn try_new(devices: &[Vec<u8>], opts: bcachefs::bch_opts) -> anyhow::Result<&mut Self> {
 		crate::rbcachefs::err::ptr_result(Self::new(devices, opts))
 	}
 }
