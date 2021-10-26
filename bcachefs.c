@@ -188,26 +188,29 @@ int main(int argc, char *argv[])
 {
 	argv_view = argv;
 	view_len = argc;
+
 	raid_init();
 
 	// Bcachefs binary call
 	// full_cmd = argv[0];
+
 	char *cmd = argv[0]; //pop_cmd(&view_len, argv_view);
+	
 	setvbuf(stdout, NULL, _IOLBF, 0);
 
 	// Multi Call Binary
-	if (str_ends_with(arg0, "mount.bcachefs")) {
+	if (str_ends_with(cmd, "mount.bcachefs")) {
 		return RS_mount_main();
 	}
-	if (str_ends_with(arg0, "fsck.bcachefs")) {
+	if (str_ends_with(cmd, "fsck.bcachefs")) {
 		return RS_cmd_fsck_main();
 	}
-	if (str_ends_with(arg0, "sb_recover")) {
+	if (str_ends_with(cmd, "sb_recover")) {
 		return RS_cmd_sb_recover_main();
 	}
 
 	// Bcachefs binary call
-	char *cmd = pop_cmd(&argc, argv);
+	char *cmd = pop_cmd(&view_len, argv_view);
 	if (argc < 1) {
 		puts("missing command\n");
 		goto usage;
@@ -215,21 +218,21 @@ int main(int argc, char *argv[])
 
 	/* these subcommands display usage when argc < 2 */
 	if (!strcmp(cmd, "device"))
-		return device_cmds(argc, argv);
+		return device_cmds(view_len, argv_view);
 	if (!strcmp(cmd, "fs"))
-		return fs_cmds(argc, argv);
+		return fs_cmds(view_len, argv_view);
 	if (!strcmp(cmd, "data"))
-		return data_cmds(argc, argv);
+		return data_cmds(view_len, argv_view);
 	if (!strcmp(cmd, "subvolume"))
-		return subvolume_cmds(argc, argv);
+		return subvolume_cmds(view_len, argv_view);
 	if (!strcmp(cmd, "format"))
-		return cmd_format(argc, argv);
+		return cmd_format(view_len, argv_view);
 	if (!strcmp(cmd, "fsck"))
-		return cmd_fsck(argc, argv);
+		return cmd_fsck(view_len, argv_view);
 	if (!strcmp(cmd, "version"))
-		return cmd_version(argc, argv);
+		return cmd_version(view_len, argv_view);
 	if (!strcmp(cmd, "show-super"))
-		return cmd_show_super(argc, argvv);
+		return cmd_show_super(view_len, argv_view);
 
 	if (argc < 2) {
 		printf("%s: missing command\n", argv[0]);
@@ -249,30 +252,30 @@ int main(int argc, char *argv[])
 #endif
 
 	if (!strcmp(cmd, "unlock"))
-		return cmd_unlock(argc, argv);
+		return cmd_unlock(view_len, argv_view);
 	if (!strcmp(cmd, "set-passphrase"))
-		return cmd_set_passphrase(argc, argv);
+		return cmd_set_passphrase(view_len, argv_view);
 	if (!strcmp(cmd, "remove-passphrase"))
-		return cmd_remove_passphrase(argc, argv);
+		return cmd_remove_passphrase(view_len, argv_view);
 
 	if (!strcmp(cmd, "migrate"))
-		return cmd_migrate(argc, argv);
+		return cmd_migrate(view_len, argv_view);
 	if (!strcmp(cmd, "migrate-superblock"))
-		return cmd_migrate_superblock(argc, argv);
+		return cmd_migrate_superblock(view_len, argv_view);
 
 	if (!strcmp(cmd, "dump"))
-		return cmd_dump(argc, argv);
+		return cmd_dump(view_len, argv_view);
 	if (!strcmp(cmd, "list"))
-		return cmd_list(argc, argv);
+		return cmd_list(view_len, argv_view);
 	if (!strcmp(cmd, "list_journal"))
-		return cmd_list_journal(argc, argv);
+		return cmd_list_journal(view_len, argv_view);
 
 	if (!strcmp(cmd, "setattr"))
-		return cmd_setattr(argc, argv);
+		return cmd_setattr(view_len, argv_view);
 
 #ifdef BCACHEFS_FUSE
 	if (!strcmp(cmd, "fusemount"))
-		return cmd_fusemount(argc, argv);
+		return cmd_fusemount(view_len, argv_view);
 #endif
 
 	if (!strcmp(cmd, "--help")) {
