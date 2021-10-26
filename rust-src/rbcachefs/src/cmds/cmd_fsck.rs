@@ -22,9 +22,9 @@ fn mk_opts(args: &Options) -> crate::c::bcachefs::bch_opts {
 		reconstruct_alloc: args.reconstruct_alloc as u8,
 		verbose: args.verbose as u8,
 		nochanges: args.dry_run as u8,
-		fix_errors: match (args.dry_run, args.auto_repair.or(args.assume_yes)) {
+		fix_errors: match (args.dry_run, args.auto_repair || args.assume_yes) {
 			(true, _) => fsck_err_opts::FSCK_OPT_NO,
-			(_, Some(true)) => fsck_err_opts::FSCK_OPT_YES,
+			(_, true) => fsck_err_opts::FSCK_OPT_YES,
 			_ => fsck_err_opts::FSCK_OPT_ASK,
 		} as u8,
 		..Default::default()
@@ -60,7 +60,7 @@ fn parse_mount_options(options: &str, opts: &mut crate::c::bcachefs::bch_opts) {
 	}
 }
 
-use std::{ffi::CString, ops::Deref, os::unix::prelude::OsStrExt, path::PathBuf};
+use std::{convert::TryInto, ffi::CString, ops::Deref, os::unix::prelude::OsStrExt, path::PathBuf};
 fn check_devices_mounted(devices: &Vec<PathBuf>) -> anyhow::Result<()> {
 	for dev in devices {
 		let buffer = dev.as_os_str().as_bytes();
@@ -140,15 +140,15 @@ use structopt::StructOpt;
 pub struct Options {
 	/// Automatic Repair (No Questions)
 	#[structopt(short = "p", long)]
-	pub auto_repair: Option<bool>,
+	pub auto_repair: bool,
 
 	/// Don't repair, only check for errors
-	#[structopt(short = "n", long)]
+	#[structopt(short = "n", long, conflicts_with_all(&["auto_repair", "assume_yes"]))]
 	pub dry_run: bool,
 
 	/// Assume "yes" to all questions
 	#[structopt(short = "y", long)]
-	pub assume_yes: Option<bool>,
+	pub assume_yes: bool,
 
 	/// Force checking even if filesystem is marked clean
 	#[structopt(short = "f", long)]
@@ -164,7 +164,7 @@ pub struct Options {
 
 	/// Devices
 	#[structopt(required(true))]
-	pub devices: Vec<PathBuf>,
+	pub devices: Vec<PathBuf>,//Device,
 
 	// /// Options List
 	// #[structopt(short="o", long, parse(from_str = parse_mount_options))]
@@ -174,6 +174,27 @@ pub struct Options {
 	pub options: Option<String>,
 }
 
+#[derive(Debug)]
+pub enum Device {
+	Uuid(uuid::Uuid),
+	DevArray(Vec<PathBuf>),
+}
+
+// impl core::str::FromStr for Device {
+//     type Err;
+
+//     fn from_str(s: &str) -> Result<Self, Self::Err> {
+// 		match (uuid::Uuid::parse_str(s), Vec::<PathBuf>::parse(s)) {
+// 			(Err(_), Err(_))=>{},
+// 			(Ok(uuid), _) => {},
+// 			(_, Ok(vec)) => {},
+// 			_ => unreachable!(),
+// 		}
+// 		// letz uuid: uuid::Uuid = s.try_into();
+// 		// let devArray = Vec<PathBuf> = s.parse();
+
+//     }
+// }
 // pub struct OptionsFstab {
 // 	/// Allowed
 // 	/// UUID=
