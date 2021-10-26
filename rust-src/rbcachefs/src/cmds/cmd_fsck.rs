@@ -110,6 +110,13 @@ fn fsck() -> anyhow::Result<()> {
 	// 	fprintf(stderr, "%s: still has errors\n", c->name);
 	// 	ret |= 4; // Filesystem Errors Left Uncorrected
 	// }
+	tracing::info!("FileSystem Opened");
+	if c_fs.flags.bit(crate::c::bcachefs::BCH_FS_ERRORS_FIXED as usize) {
+		tracing::info!(msg="Filesystem Errors Corrected", name=?c_fs.name);
+	}
+	if c_fs.flags.bit(crate::c::bcachefs::BCH_FS_ERROR as usize) {
+		tracing::error!(msg="Filesystem Still Has Errors", name=?c_fs.name)
+	}
 
 	unsafe {
 		crate::c::bcachefs::bch2_fs_stop(c_fs);
@@ -126,6 +133,7 @@ fn fsck() -> anyhow::Result<()> {
 // 	}
 // }
 
+use bitfield::Bit;
 use structopt::StructOpt;
 /// bcachefs fsck - filesystem check and repair
 #[derive(StructOpt, Debug)]
