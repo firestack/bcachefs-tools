@@ -90,13 +90,20 @@ static void usage(void)
 
 static char *full_cmd;
 static int cmd_idx = 1;
+static char **argvv;
+static int argcv = 1;
 
 static char *pop_cmd(int *argc, char *argv[])
 {
 	char *cmd = argv[1];
-	if (!(*argc < 2))
-		memmove(&argv[1], &argv[2], *argc * sizeof(argv[0]));
-	(*argc)--;
+	if (!(*argc < 2)) {
+		// memmove(&argv[1], &argv[2], *argc * sizeof(argv[0]));
+		argvv = &argv[cmd_idx];
+		char *cmd = argv[cmd_idx];
+		cmd_idx += 1;
+		// (*argc)--;
+
+	}
 
 	full_cmd = mprintf("%s %s", full_cmd, cmd);
 	return cmd;
@@ -183,6 +190,7 @@ int main(int argc, char *argv[])
 	raid_init();
 
 	char *arg0 = full_cmd = argv[0];
+	argcv = argc;
 	setvbuf(stdout, NULL, _IOLBF, 0);
 
 	// Multi Call Binary
@@ -219,7 +227,7 @@ int main(int argc, char *argv[])
 	if (!strcmp(cmd, "version"))
 		return cmd_version(argc, argv);
 	if (!strcmp(cmd, "show-super"))
-		return cmd_show_super(argc, argv);
+		return cmd_show_super(argc, argvv);
 
 	if (argc < 2) {
 		printf("%s: missing command\n", argv[0]);
