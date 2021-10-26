@@ -88,12 +88,11 @@ static void usage(void)
 	     "  version                  Display the version of the invoked bcachefs tool\n");
 }
 
-static char *full_cmd;
-static int cmd_idx = 1;
-static char **argvv;
-static int argcv = 1;
+// static char *full_cmd;
+static char **argv_view;
+static int view_len;
 
-static char *pop_cmd(int *argc, char *argv[])
+static char *pop_cmd(int *argc, char **argv)
 {
 	char *cmd = argv[1];
 	if (!(*argc < 2)) {
@@ -105,7 +104,7 @@ static char *pop_cmd(int *argc, char *argv[])
 
 	}
 
-	full_cmd = mprintf("%s %s", full_cmd, cmd);
+	// full_cmd = mprintf("%s %s", full_cmd, cmd);
 	return cmd;
 }
 
@@ -187,10 +186,13 @@ static bool str_ends_with(char *lhs, char *rhs) {
 
 int main(int argc, char *argv[])
 {
+	argv_view = argv;
+	view_len = argc;
 	raid_init();
 
-	char *arg0 = full_cmd = argv[0];
-	argcv = argc;
+	// Bcachefs binary call
+	// full_cmd = argv[0];
+	char *cmd = argv[0]; //pop_cmd(&view_len, argv_view);
 	setvbuf(stdout, NULL, _IOLBF, 0);
 
 	// Multi Call Binary
