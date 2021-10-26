@@ -96,15 +96,11 @@ fn fsck() -> anyhow::Result<()> {
 	// 	.collect();
 
 	let opts = mk_opts(&args);
-	let c_fs = crate::c::bcachefs::bch_fs::new(devs.as_slice(), opts);
-	if (c_fs as i64) < 4096 {
-		anyhow::bail!("ew, bad");
-	}
-	// struct bch_fs *c = bch2_fs_open(argv, argc, opts);
-	// if (IS_ERR(c)) {
-	// 	fprintf(stderr, "error opening %s: %s\n", argv[0], strerror(-PTR_ERR(c)));
-	// 	exit(8); // Operational Error
-	// }
+	let rc_fs = crate::c::bcachefs::bch_fs::try_new(devs.as_slice(), opts);
+	let c_fs = match rc_fs {
+		Ok(t) => t,
+		Err(i) => anyhow::bail!(i),
+	};
 
 	// if (test_bit(BCH_FS_ERRORS_FIXED, &c->flags)) {
 	// 	fprintf(stderr, "%s: errors fixed\n", c->name);
