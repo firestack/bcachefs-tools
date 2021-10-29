@@ -77,13 +77,13 @@
 
 			checks = { 
 				kernelSrc = packages.kernel.src;
+
 				inherit (packages) 
 					rbcachefs
 					toolsValgrind;
 
 				# Build and test initrd with bcachefs and bcachefs.mount installed
-				# Disabled Test because it takes a while to build the kernel
-				# bootStage1Module = self.nixosConfigurations.netboot-bcachefs.config.system.build.bootStage1;
+				bootStage1Module = self.nixosConfigurations.netboot-bcachefs.config.system.build.bootStage1.extraUtils;
 			};
 
 			devShell = devShells.tools;
