@@ -92,15 +92,27 @@ static void usage(void)
 static char **argv_view;
 static int view_len;
 
-static char *pop_cmd(int *argc, char **argv)
+static char *pop_cmd(int *argc, char ***argv)
 {
-	char *cmd = argv[1];
+	char *cmd = (*argv)[1];
 	if (!(*argc < 2)) {
 		// memmove(&argv[1], &argv[2], *argc * sizeof(argv[0]));
 		argvv = &argv[cmd_idx];
 		char *cmd = argv[cmd_idx];
 		cmd_idx += 1;
 		// (*argc)--;
+
+		// Return the first command for getopt to work
+		
+		// We assign to a global pointer so that
+		// we can iterate though the array without modifying the underlying memory
+		// instead, keeping an index into the argv array and knowing the count
+		// allows us to iterate and keep most of the same functionality without
+		// modifying other code
+		// Iterate the given argv pointer
+		(*argv)++;
+		// Inform the count that we've iterated
+		(*argc)--;
 
 	}
 
