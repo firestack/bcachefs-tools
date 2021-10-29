@@ -242,6 +242,7 @@ int bch2_dirent_rename(struct btree_trans *trans,
 
 	memset(src_inum, 0, sizeof(*src_inum));
 	memset(dst_inum, 0, sizeof(*dst_inum));
+	memset(&old_dst, 0, sizeof(old_dst));
 
 	/* Lookup src: */
 	ret = bch2_hash_lookup(trans, &src_iter, bch2_dirent_hash_desc,

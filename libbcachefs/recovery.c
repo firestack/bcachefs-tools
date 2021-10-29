@@ -983,7 +983,7 @@ static int bch2_fs_initialize_subvolumes(struct bch_fs *c)
 
 static int bch2_fs_upgrade_for_subvolumes(struct btree_trans *trans)
 {
-	struct bch_fs *c = trans->c;
+	// struct bch_fs *c = trans->c;
 	struct btree_iter iter;
 	struct bkey_s_c k;
 	struct bch_inode_unpacked inode;
