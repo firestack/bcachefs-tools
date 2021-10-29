@@ -56,6 +56,7 @@ impl std::str::FromStr for KeyLoc {
 
 #[derive(StructOpt, Debug)]
 /// Mount a bcachefs filesystem by its UUID.
+#[structopt(name="mount.bcachefs")]
 pub struct Options {
 	/// Where the password would be loaded from.
 	///
