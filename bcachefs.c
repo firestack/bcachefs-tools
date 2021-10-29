@@ -122,7 +122,7 @@ static char *pop_cmd(int *argc, char ***argv)
 
 static int fs_cmds(int argc, char *argv[])
 {
-	char *cmd = pop_cmd(&argc, argv);
+	char *cmd = pop_cmd(&argc, &argv);
 
 	if (argc < 2)
 		return fs_usage();
@@ -134,7 +134,7 @@ static int fs_cmds(int argc, char *argv[])
 
 static int device_cmds(int argc, char *argv[])
 {
-	char *cmd = pop_cmd(&argc, argv);
+	char *cmd = pop_cmd(&argc, &argv);
 
 	if (argc < 2)
 		return device_usage();
@@ -160,7 +160,7 @@ static int device_cmds(int argc, char *argv[])
 
 static int data_cmds(int argc, char *argv[])
 {
-	char *cmd = pop_cmd(&argc, argv);
+	char *cmd = pop_cmd(&argc, &argv);
 
 	if (argc < 2)
 		return data_usage();
@@ -174,9 +174,10 @@ static int data_cmds(int argc, char *argv[])
 
 static int subvolume_cmds(int argc, char *argv[])
 {
-	char *cmd = pop_cmd(&argc, argv);
+	char *cmd = pop_cmd(&argc, &argv);
 	if (argc < 2)
 		return subvolume_usage();
+		
 	if (!strcmp(cmd, "create"))
 		return cmd_subvolume_create(argc, argv);
 	if (!strcmp(cmd, "delete"))
@@ -222,7 +223,7 @@ int main(int argc, char *argv[])
 	}
 
 	// Bcachefs binary call
-	char *cmd = pop_cmd(&view_len, argv_view);
+	cmd = pop_cmd(&view_len, &argv_view);
 	if (argc < 1) {
 		puts("missing command\n");
 		goto usage;
