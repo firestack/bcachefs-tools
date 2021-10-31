@@ -174,11 +174,8 @@ pub fn probe_filesystems() -> anyhow::Result<HashMap<Uuid, FileSystem>> {
 				});
 
 				fs.devices.push(pathbuf);
-			}
-
-			Err(e) => {
-				tracing::debug!(inner2_error=?e);
-			}
+			},
+			_ => {},
 		}
 	}
 
