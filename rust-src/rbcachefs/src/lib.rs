@@ -23,5 +23,7 @@ pub fn init_tracing() {
 	// convert existing log statements to tracing events
 	// tracing_log::LogTracer::init().expect("logtracer init failed!");
 	// format tracing log data to env_logger like stdout
-	tracing_subscriber::fmt::init();
+	tracing_subscriber::fmt().with_env_filter(
+		tracing_subscriber::EnvFilter::from_env("BCH_LOG")
+	).init();
 }
