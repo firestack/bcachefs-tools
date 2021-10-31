@@ -1,19 +1,6 @@
 #[no_mangle]
 pub extern "C" fn RS_mount_main() -> i32 {
-	main();
-	0
-}
-
-fn main() -> i32 {
-	crate::init_tracing();
-
-	match main_inner() {
-		Err(e) => {
-			tracing::error!(fatal_error = ?e);
-			1
-		}
-		_ => 0,
-	}
+	crate::call_err_fn_for_c(|| main_inner())
 }
 
 #[tracing::instrument("main")]
