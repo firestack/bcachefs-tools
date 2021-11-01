@@ -195,31 +195,49 @@ deb: all
 	debuild -us -uc -nc -b -i -I
 
 .PHONY: update-bcachefs-sources
+
+WRKT:=$(shell mktemp -d)
 update-bcachefs-sources:
+	git -C $(LINUX_DIR) worktree add $(WRKT)
+
 	git rm -rf --ignore-unmatch libbcachefs
+
 	test -d libbcachefs || mkdir libbcachefs
-	cp $(LINUX_DIR)/fs/bcachefs/*.[ch] libbcachefs/
+	cp $(WRKT)/fs/bcachefs/*.[ch] libbcachefs/
 	git add libbcachefs/*.[ch]
-	cp $(LINUX_DIR)/include/trace/events/bcachefs.h include/trace/events/
+	cp $(WRKT)/include/trace/events/bcachefs.h include/trace/events/
 	git add include/trace/events/bcachefs.h
-	cp $(LINUX_DIR)/include/linux/xxhash.h include/linux/
+	cp $(WRKT)/include/linux/xxhash.h include/linux/
 	git add include/linux/xxhash.h
-	cp $(LINUX_DIR)/lib/xxhash.c linux/
+	cp $(WRKT)/lib/xxhash.c linux/
 	git add linux/xxhash.c
-	cp $(LINUX_DIR)/kernel/locking/six.c linux/
+	cp $(WRKT)/kernel/locking/six.c linux/
 	git add linux/six.c
-	cp $(LINUX_DIR)/include/linux/six.h include/linux/
+	cp $(WRKT)/include/linux/six.h include/linux/
 	git add include/linux/six.h
-	cp $(LINUX_DIR)/include/linux/list_nulls.h include/linux/
+	cp $(WRKT)/include/linux/list_nulls.h include/linux/
 	git add include/linux/list_nulls.h
-	cp $(LINUX_DIR)/include/linux/poison.h include/linux/
+	cp $(WRKT)/include/linux/poison.h include/linux/
 	git add include/linux/poison.h
-	cp $(LINUX_DIR)/scripts/Makefile.compiler ./
+	
+	cp $(WRKT)/scripts/Makefile.compiler ./
 	git add Makefile.compiler
+	
 	$(RM) libbcachefs/*.mod.c
+	
 	git -C $(LINUX_DIR) rev-parse HEAD | tee .bcachefs_revision
 	git add .bcachefs_revision
 	
+## Calculate Nix Hash which does not contain .git
+## A Worktree is the easiest way to get a managed
+## Checkout which can easily have .git destroyed
+	rm $(WRKT)/.git
+	nix hash path $(WRKT) > ./nix/bcachefs.rev.sha256
+	git add ./nix/bcachefs.rev.sha256
+
+	git -C $(LINUX_DIR) worktree repair
+	git -C $(LINUX_DIR) worktree remove $(WRKT)
+
 
 .PHONY: update-commit-bcachefs-sources
 update-commit-bcachefs-sources: update-bcachefs-sources
