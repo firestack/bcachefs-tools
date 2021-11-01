@@ -115,7 +115,7 @@ stdenv.mkDerivation {
 
 	preCheck =
 		''
-			makeFlagsArray+=(PYTEST_ARGS="--verbose -n$\{NIX_BUILD_CORES}")
+			makeFlagsArray+=(PYTEST_ARGS="--verbose -n$NIX_BUILD_CORES")
 		'' +
 		lib.optionalString fuseSupport ''
 			rm tests/test_fuse.py
