@@ -137,6 +137,7 @@ use bitfield::Bit;
 use structopt::StructOpt;
 /// bcachefs fsck - filesystem check and repair
 #[derive(StructOpt, Debug)]
+#[structopt(name="fsck.bcachefs")]
 pub struct Options {
 	/// Automatic Repair (No Questions)
 	#[structopt(short = "p", long)]
