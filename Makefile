@@ -198,15 +198,20 @@ deb: all
 
 WRKT:=$(shell mktemp -d)
 update-bcachefs-sources:
+## Create Worktree
 	git -C $(LINUX_DIR) worktree add $(WRKT)
 
+## Remove -tools libbcachefs
 	git rm -rf --ignore-unmatch libbcachefs
 
+## Create libbcachefs from kernel sources
 	test -d libbcachefs || mkdir libbcachefs
 	cp $(WRKT)/fs/bcachefs/*.[ch] libbcachefs/
 	git add libbcachefs/*.[ch]
+## More Bcachefs includes
 	cp $(WRKT)/include/trace/events/bcachefs.h include/trace/events/
 	git add include/trace/events/bcachefs.h
+## include libraries from kernel
 	cp $(WRKT)/include/linux/xxhash.h include/linux/
 	git add include/linux/xxhash.h
 	cp $(WRKT)/lib/xxhash.c linux/
@@ -235,6 +240,7 @@ update-bcachefs-sources:
 	nix hash path $(WRKT) > ./nix/bcachefs.rev.sha256
 	git add ./nix/bcachefs.rev.sha256
 
+## Cleanup worktree, repair damages
 	git -C $(LINUX_DIR) worktree repair
 	git -C $(LINUX_DIR) worktree remove $(WRKT)
 
