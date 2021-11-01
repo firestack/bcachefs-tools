@@ -110,12 +110,12 @@ stdenv.mkDerivation {
 	checkFlags = [ 
 		"BCACHEFS_TEST_USE_VALGRIND=${if testWithValgrind then "yes" else "no"}"
 		# cannot escape spaces within make flags, quotes are stripped
-		"PYTEST_CMD=pytest" # "PYTEST_ARGS='-n4 --version'"
+		"PYTEST_CMD=pytest"
 	];
 
 	preCheck =
 		''
-			makeFlagsArray+=(PYTEST_ARGS="--verbose -n2")
+			makeFlagsArray+=(PYTEST_ARGS="--verbose -n$\{NIX_BUILD_CORES}")
 		'' +
 		lib.optionalString fuseSupport ''
 			rm tests/test_fuse.py
