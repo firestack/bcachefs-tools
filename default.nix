@@ -82,7 +82,9 @@ stdenv.mkDerivation {
 
 	makeFlags = [
 		"PREFIX=${placeholder "out"}"
-	] ++ lib.optional debugMode "EXTRA_CFLAGS=-ggdb";
+		"EXTRA_CFLAGS=-gdwarf -Wl,--build-id"
+
+	] ++ lib.optional debugMode "";
 
 	installFlags = [
 		"INITRAMFS_DIR=${placeholder "out"}/etc/initramfs-tools"
@@ -109,7 +111,9 @@ stdenv.mkDerivation {
 			rm tests/test_fuse.py
 		'';
 
-	dontStrip = debugMode == true;
+	# dontStrip = debugMode == true;
+	separateDebugInfo = true;
+
 	passthru = {
 		bcachefs_revision = let 
 			file = builtins.readFile ./.bcachefs_revision;
