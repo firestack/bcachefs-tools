@@ -1,5 +1,4 @@
 { lib
-, filter
 
 , stdenv
 , pkg-config
@@ -35,25 +34,14 @@
 
 assert fuseSupport -> fuse3 != null;
 assert testWithValgrind -> valgrind != null;
+let version = "v0.1-flake-${versionString}"; in
 stdenv.mkDerivation {
 	pname = "bcachefs-tools";
 
-	version = "v0.1-flake-${versionString}";
-	VERSION = "v0.1-flake-${versionString}";
+	inherit version;
+	VERSION = version;
 	
-	src = filter.filter {
-		name = "bcachefs-tools";
-		root = ./.;
-		exclude = [
-			./rust-src
-			
-			./.git
-			./nix
-			
-			./flake.nix
-			./flake.lock
-		];
-	};
+	src = bcachefs.toolsSrc;
 
 	postPatch = "patchShebangs --build doc/macro2rst.py";
 
