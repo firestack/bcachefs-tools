@@ -34,16 +34,18 @@ fn bch_bindgen() {
 }
 
 /// Generate bindings for libbcachefs
-fn libbcachefs_bindings(output_dir: &Path, manifest_dir: &Path, libbcachefs_inc_dir: &Path) {
+fn libbcachefs_bindings(output_dir: &Path, crate_dir: &Path, libbcachefs_src: &Path) {
 	let bindings = bindgen::builder()
 		.header(
-			manifest_dir
+			crate_dir
 				.join("src/c/bcachefs/libbcachefs_wrapper.h")
 				.display()
 				.to_string(),
 		)
-		.clang_arg(format!("-I{}", libbcachefs_inc_dir.join("include").display()))
-		.clang_arg(format!("-I{}", libbcachefs_inc_dir.display()))
+		.clang_args([
+			libbcachefs_src.display(),
+			libbcachefs_src.join("include").display()
+		].iter().map(|i| format!("-I{}", i)))
 		.clang_arg("-DZSTD_STATIC_LINKING_ONLY")
 		.clang_arg("-DNO_BCACHEFS_FS")
 		.clang_arg("-D_GNU_SOURCE")
