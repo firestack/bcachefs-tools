@@ -60,7 +60,7 @@ fn parse_mount_options(options: &str, opts: &mut crate::c::bcachefs::bch_opts) {
 	}
 }
 
-use std::{convert::TryInto, ffi::CString, ops::Deref, os::unix::prelude::OsStrExt, path::PathBuf};
+use std::{ffi::CString, ops::Deref, os::unix::prelude::OsStrExt, path::PathBuf};
 fn check_devices_mounted(devices: &Vec<PathBuf>) -> anyhow::Result<()> {
 	for dev in devices {
 		let buffer = dev.as_os_str().as_bytes();
