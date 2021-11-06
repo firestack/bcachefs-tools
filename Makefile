@@ -133,13 +133,9 @@ DEPS=$(SRCS:.c=.d)
 OBJS=$(SRCS:.c=.o) librbcachefs.a
 bcachefs: $(filter-out ./tests/%.o, $(OBJS))
 
-mount.bcachefs: bcachefs
-	$(LN) -f $+ $@
 
-sb_recover: bcachefs
-	$(LN) -f $+ $@
 
-fsck.bcachefs: bcachefs
+mount.bcachefs sb_recover fsck.bcachefs: bcachefs
 	$(LN) -f $+ $@
 
 RUST_SRCS=$(shell find rust-src/ -type f -iname '*.rs')
