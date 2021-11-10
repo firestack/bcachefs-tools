@@ -95,8 +95,8 @@ static char *pop_cmd(int *argc, char **argv[])
 	char *cmd = (*argv)[1];
 	if (!(*argc <= 1)) {
 		(*argv)++;
-		(*argc)--;
 	}
+	(*argc)--;
 
 	full_cmd = mprintf("%s %s", full_cmd, cmd);
 	return cmd;
