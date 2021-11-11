@@ -96,7 +96,7 @@ endif
 all: bcachefs bcachefs.5
 
 .PHONY: rust
-rust:  mount.bcachefs fsck.bcachefs sb_recover
+rust:  mount.bcachefs fsck.bcachefs sb_recover bcachefs.rs
 
 .PHONY: tests
 tests: tests/test_helper
@@ -136,8 +136,7 @@ OBJS=$(SRCS:.c=.o) librbcachefs.a
 bcachefs: $(filter-out ./tests/%.o, $(OBJS))
 
 
-
-mount.bcachefs sb_recover fsck.bcachefs: bcachefs
+mount.bcachefs sb_recover fsck.bcachefs bcachefs.rs: bcachefs
 	$(LN) -f $+ $@
 
 RUST_SRCS=$(shell find rust-src/ -type f -iname '*.rs')
