@@ -75,6 +75,10 @@
 				tools-musl = pkgs.pkgsMusl.bcachefs.tools;
 			};
 
+			hydraJobs = {
+				kernel = pkgs.bcachefs.kernel;
+			};
+
 			checks = { 
 				kernelSrc = packages.kernel.src;
 
