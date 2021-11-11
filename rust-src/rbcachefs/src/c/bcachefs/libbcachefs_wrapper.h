@@ -6,4 +6,5 @@
 #include <libbcachefs/error.h>
 #include <include/linux/bio.h>
 #include <crypto.h>
+#include <cmds.h>
 // #include <tools-util.h>
