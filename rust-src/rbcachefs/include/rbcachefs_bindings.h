@@ -18,4 +18,6 @@ int32_t RS_cmd_sb_recover_main(void);
 
 int32_t RS_mount_main(void);
 
+int32_t bcachefs_start(void);
+
 #endif /* RBCACHEFS_H */
