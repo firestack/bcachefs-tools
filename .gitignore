@@ -1,8 +1,8 @@
 # binaries and outputs
 /result
-bcachefs
-bcachefs.5
-bcachefs.rs
+/bcachefs
+/bcachefs.5
+/bcachefs.rs
 
 # Make effects
 .*
