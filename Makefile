@@ -44,9 +44,11 @@ CARGO_ARGS=
 CARGO=cargo $(CARGO_ARGS)
 # default is debug
 # set to debug for default profile
-CARGO_PROFILE_DIR?=release
+CARGO_PROFILE_DIR?=debug
+# CARGO_PROFILE_DIR?=release
 # Unset for default profile
-CARGO_PROFILE?=--release
+CARGO_PROFILE?=
+# CARGO_PROFILE?=--release
 
 CARGO_BUILD_ARGS=$(CARGO_PROFILE)
 CARGO_BUILD=$(CARGO) build $(CARGO_BUILD_ARGS)
