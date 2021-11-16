@@ -37,9 +37,14 @@ assert testWithValgrind -> valgrind != null;
 stdenv.mkDerivation {
 	pname = "bcachefs-tools";
 
-	version = "v0.1-flake-${versionString}";
-	VERSION = "v0.1-flake-${versionString}";
+	inherit (rec {
+		gitVersion = "v0.1";
+
+		version = "${gitVersion}-flake-${versionString}";
+		VERSION = version;
+	}) version VERSION;
 	
+
 	src = filter.filter {
 		name = "bcachefs-tools";
 		root = ./.;
